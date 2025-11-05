@@ -137,8 +137,8 @@ function Register() {
               >
                 <option key="region-default" value="" disabled>Selecciona una región</option>
                 
-                {listaRegiones.map((region) => (
-                  <option key={region.regionId} value={region.regionId}>
+                {listaRegiones.map((region, index) => (
+                  <option key={region.regionId} value={index}>
                     {region.nombre}
                   </option>
                 ))}

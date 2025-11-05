@@ -4,6 +4,8 @@ import Nav from './Components/Nav'
 import Login from './views/Login'
 import Register from './views/Register'
 import Alert from './views/User/Alert'
+import Home from './views/Home'
+
 
 
 function App() {
