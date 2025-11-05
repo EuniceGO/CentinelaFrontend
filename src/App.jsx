@@ -8,8 +8,7 @@ import Alert from './views/User/Alert'
 import ReportForm from './views/ReportForm'
 import Logout from './views/Logout'
 import Inicio from './views/Home'
-
-
+import Dashboard from './views/Dashboard'
 
 function App() {
 
