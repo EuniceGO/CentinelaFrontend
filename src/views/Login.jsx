@@ -1,8 +1,8 @@
 import React, { useState } from 'react'
 import axios from 'axios'
 import { useNavigate } from 'react-router-dom'
-import storage from './Storage/storage'
-import showAlert from './functions.jsx'
+import storage from '../Storage/storage.jsx'
+import showAlert from '../functions.jsx'
 
 function Login() {
   const [correo, setCorreo] = useState('')
@@ -19,7 +19,7 @@ function Login() {
       storage.set('user', user)
       storage.set('auth', true)
       showAlert('success', 'Login successful')
-      setTimeout(() => navigate('/'), 800)
+      setTimeout(() => navigate('/Alert'), 800)
     } catch (error) {
       const msg = error?.response?.data?.message || 'Login failed'
       showAlert('error', msg)

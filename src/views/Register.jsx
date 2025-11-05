@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import axios from 'axios'
 import { useNavigate } from 'react-router-dom'
-import showAlert from '../functions.jsx'
+import showAlert from '../functions.jsx' 
 
 function Register() {
  
@@ -70,7 +70,6 @@ function Register() {
 
   return (
    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-100 via-white to-white p-4">
-      {/* DISEÑO: Tarjeta más ancha (max-w-lg), con más sombra y bordes redondeados */}
       <div className="max-w-lg w-full bg-white p-8 md:p-10 rounded-xl shadow-2xl space-y-6">
         
         {/* DISEÑO: Textos del encabezado actualizados */}
@@ -124,7 +123,7 @@ function Register() {
                 placeholder="Teléfono" />
             </div>
 
-            {/* --- Diseño de Selects actualizado --- */}
+            
             <div>
               <label htmlFor="region" className="sr-only">Región</label>
               <select
@@ -138,9 +137,9 @@ function Register() {
               >
                 <option key="region-default" value="" disabled>Selecciona una región</option>
                 
-                {listaRegiones.map((regionNombre, index) => (
-                  <option key={regionNombre + index} value={regionNombre}>
-                    {regionNombre}
+                {listaRegiones.map((region) => (
+                  <option key={region.regionId} value={region.regionId}>
+                    {region.nombre}
                   </option>
                 ))}
               </select>
