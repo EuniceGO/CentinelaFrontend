@@ -3,6 +3,7 @@ import axios from 'axios'
 import { useNavigate } from 'react-router-dom'
 import showAlert from '../functions.jsx' 
 
+
 function Register() {
  
   const [formData, setFormData] = useState({
@@ -72,7 +73,7 @@ function Register() {
    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-100 via-white to-white p-4">
       <div className="max-w-lg w-full bg-white p-8 md:p-10 rounded-xl shadow-2xl space-y-6">
         
-        {/* DISEÑO: Textos del encabezado actualizados */}
+
         <div>
           <h2 className="text-center text-3xl font-bold tracking-tight text-indigo-900">
             Crea tu cuenta
@@ -83,15 +84,12 @@ function Register() {
         </div>
         
         <form className="space-y-6" onSubmit={handleSubmit}>
-          {/* CAMBIO: Se quitó el 'rounded-md -space-y-px' para espaciar los campos */}
           <div className="space-y-4">
             
-            {/* --- Diseño de Inputs actualizado --- */}
             <div>
               <label htmlFor="nombre" className="sr-only">Nombre</label>
               <input id="nombre" name="nombre" type="text" required
                 value={formData.nombre} onChange={handleChange}
-                // DISEÑO: Bordes grises, foco en indigo
                 className="appearance-none rounded-md relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                 placeholder="Nombre completo" />
             </div>
@@ -100,7 +98,6 @@ function Register() {
               <label htmlFor="correo" className="sr-only">Correo</label>
               <input id="correo" name="correo" type="email" required
                 value={formData.correo} onChange={handleChange}
-                // DISEÑO: Bordes grises, foco en indigo
                 className="appearance-none rounded-md relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                 placeholder="Correo electrónico" />
             </div>
@@ -137,8 +134,8 @@ function Register() {
               >
                 <option key="region-default" value="" disabled>Selecciona una región</option>
                 
-                {listaRegiones.map((region) => (
-                  <option key={region.regionId} value={region.regionId}>
+                {listaRegiones.map((region, index) => (
+                  <option key={region.regionId} value={index}>
                     {region.nombre}
                   </option>
                 ))}

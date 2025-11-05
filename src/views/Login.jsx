@@ -12,14 +12,16 @@ function Login() {
   const handleSubmit = async (e) => {
     e.preventDefault()
     try {
-      const res = await axios.post('http://localhost:8080/api/usuarios/login', { correo, contrasena })
+      const res = await axios.post('http://localhost:8080/api/usuarios/login', { correo, contrasena },
+        { withCredentials: true }
+      )
       const user = res.data
       
       if (user && user.contrasena) user.contrasena = null
       storage.set('user', user)
-  storage.set('auth', true)
-  showAlert('success', 'Login successful')
-  setTimeout(() => navigate('/dashboard'), 800)
+      storage.set('auth', true)
+      showAlert('success', 'Login successful')
+      setTimeout(() => navigate('/home'), 800)
     } catch (error) {
       const msg = error?.response?.data?.message || 'Login failed'
       showAlert('error', msg)

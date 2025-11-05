@@ -43,12 +43,23 @@ function Nav() {
                 Alertas
               </Link>
             </li>
-
             <li className="nav-item">
-              <span className="nav-link disabled" aria-disabled="true">
-                Disabled
-              </span>
+              <Link className="nav-link" to="/link">
+                Reporte
+              </Link>
             </li>
+            <li className="nav-item">
+              <Link className="nav-link" to="/link">
+                Notificaciones
+              </Link>
+            </li>
+            <li className="nav-item">
+              <Link className="nav-link" to="/link">
+                Perfil
+              </Link>
+            </li>
+
+            
           </ul>
 
           <form className="d-flex align-items-center" role="search">
