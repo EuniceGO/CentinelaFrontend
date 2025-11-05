@@ -51,7 +51,7 @@ function Nav() {
             </li>
           </ul>
 
-          <form className="d-flex" role="search">
+          <form className="d-flex align-items-center" role="search">
             <input
               className="form-control me-2"
               type="search"
@@ -61,6 +61,7 @@ function Nav() {
             <button className="btn btn-outline-success" type="submit">
               Search
             </button>
+            <button type="button" className="btn btn-outline-danger ms-2" onClick={logout}>Cerrar sesión</button>
           </form>
         </div>
       </div>

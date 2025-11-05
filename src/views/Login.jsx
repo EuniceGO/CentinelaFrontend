@@ -17,9 +17,9 @@ function Login() {
       
       if (user && user.contrasena) user.contrasena = null
       storage.set('user', user)
-      storage.set('auth', true)
-      showAlert('success', 'Login successful')
-      setTimeout(() => navigate('/Alert'), 800)
+  storage.set('auth', true)
+  showAlert('success', 'Login successful')
+  setTimeout(() => navigate('/dashboard'), 800)
     } catch (error) {
       const msg = error?.response?.data?.message || 'Login failed'
       showAlert('error', msg)
