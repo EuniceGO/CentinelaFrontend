@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState } from 'react'
 import axios from 'axios'
 import { useNavigate } from 'react-router-dom'
 import storage from '../Storage/storage.jsx'
@@ -9,40 +9,21 @@ function Login() {
   const [contrasena, setContrasena] = useState('')
   const navigate = useNavigate()
 
-  // Check if user is already authenticated
-  useEffect(() => {
-    const auth = storage.get('auth')
-    if (auth) {
-      navigate('/Alert')
-    }
-  }, [navigate])
-
   const handleSubmit = async (e) => {
     e.preventDefault()
     try {
-      const res = await axios.post(
-        'http://localhost:8080/apiCentinela/usuarios/login', 
-        { correo, contrasena },
-        { withCredentials: false }
+      const res = await axios.post('http://localhost:8080/api/usuarios/login', { correo, contrasena },
+        { withCredentials: true }
       )
-      
       const user = res.data
-      if (!user) {
-        throw new Error('Respuesta inválida del servidor')
-      }
-
-      // Remove sensitive data
-      if (user.contrasena) delete user.contrasena
       
-      // Store user data and auth status
+      if (user && user.contrasena) user.contrasena = null
       storage.set('user', user)
       storage.set('auth', true)
-      
-      showAlert('success', 'Inicio de sesión exitoso')
-      setTimeout(() => navigate('/Alert'), 800)
+      showAlert('success', 'Login successful')
+      setTimeout(() => navigate('/home'), 800)
     } catch (error) {
-      console.error('Login error:', error?.response || error)
-      const msg = error?.response?.data?.message || 'Error al iniciar sesión'
+      const msg = error?.response?.data?.message || 'Login failed'
       showAlert('error', msg)
     }
   }
