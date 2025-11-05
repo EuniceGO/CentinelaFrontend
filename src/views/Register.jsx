@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import axios from 'axios'
 import { useNavigate } from 'react-router-dom'
-import showAlert from './functions.jsx'
+import showAlert from '../functions.jsx'
 
 function Register() {
  
@@ -181,7 +181,7 @@ function Register() {
           </div>
 
           <div>
-            {/* DISEÑO: Botón de color indigo, con sombra y transición */}
+           
             <button type="submit" className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 shadow-lg shadow-indigo-500/50 transition duration-150 ease-in-out">
               Registrarme
             </button>
