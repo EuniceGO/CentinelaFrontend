@@ -1,8 +1,6 @@
 import React from 'react'
 
-// --- CORRECCIÓN ---
-// La variable 'posts' no estaba definida. 
-// Añadimos un array de ejemplo para que el componente pueda renderizar.
+
 const posts = [
   {
     id: 1,
