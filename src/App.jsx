@@ -6,8 +6,9 @@ import Login from './views/Login'
 import Register from './views/Register'
 import Alert from './views/User/Alert'
 import ReportForm from './views/ReportForm'
-import Dashboard from './views/Dashboard'
 import Logout from './views/Logout'
+import Inicio from './views/Home'
+
 
 
 function App() {
@@ -24,7 +25,8 @@ function App() {
   <Route path="/logout" element={<Logout />} />
 
         <Route path="/dashboard" element={<Dashboard />} />
-        <Route path='/Alert' element={<Alert />} />
+        <Route path='/alert' element={<Alert />} />
+        <Route path='/home' element={<Inicio />} />
         <Route path='/report' element={<ReportForm />} />
 
        </Routes>
