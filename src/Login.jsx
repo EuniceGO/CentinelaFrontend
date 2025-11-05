@@ -12,7 +12,7 @@ function Login() {
   const handleSubmit = async (e) => {
     e.preventDefault()
     try {
-      const res = await axios.post('http://localhost:8080/apiCentinela/usuarios/login', { correo, contrasena })
+      const res = await axios.post('http://localhost:8080/api/usuarios/login', { correo, contrasena })
       const user = res.data
       
       if (user && user.contrasena) user.contrasena = null

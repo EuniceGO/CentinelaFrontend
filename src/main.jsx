@@ -5,6 +5,7 @@ import 'bootstrap/dist/css/bootstrap.min.css'
 import axios from 'axios'
 import 'bootstrap/dist/js/bootstrap.bundle.min.js'
 import App from './App.jsx'
+import './App.css'
 
 
 
