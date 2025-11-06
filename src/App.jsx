@@ -12,6 +12,9 @@ import Dashboard from './views/Dashboard'
 import ProtectedRoutes from './Components/ProtectedRoutes'
 import Region from './views/Admin/Region'
 import EditUser from './views/Admin/EditUser'
+import CreateAlert from './views/Admin/CreateAlert'
+import ViewAlert from './views/Admin/ViewAlert'
+
 
 
 
@@ -42,6 +45,8 @@ function App() {
             {/* Rutas de administración */}
             <Route path='/admin/edit-user' element={<EditUser />} />
             <Route path='/admin/region' element={<Region />} />
+            <Route path='/admin/create-alert' element={<CreateAlert />} />
+            <Route path='/admin/view-alert' element={<ViewAlert />} />
 
           </Route>
 
