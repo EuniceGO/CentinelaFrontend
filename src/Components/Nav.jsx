@@ -116,13 +116,13 @@ function Navbar() {
                     </button>
                     {isAlertDropdownOpen && (
                       <div className="absolute left-0 mt-1 w-48 rounded-lg border bg-white shadow-lg divide-y divide-gray-100 z-50">
-                        <Link to="/admin/view-alert" onClick={() => setIsAlertDropdownOpen(false)} className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">Ver Alertas </Link>
+                        <Link to="/view-alert" onClick={() => setIsAlertDropdownOpen(false)} className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">Ver Alertas </Link>
                         <Link to="/admin/create-alert" onClick={() => setIsAlertDropdownOpen(false)} className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">Crear Alerta</Link>
                       </div>
                     )}
                   </div>
                 ) : (
-                  <Link to="/alert" className="text-gray-700 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium">Alerta</Link>
+                 <Link to="/view-alert" onClick={() => setIsAlertDropdownOpen(false)} className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">Ver Alertas </Link>
                 )}
                 
 
@@ -218,7 +218,7 @@ function Navbar() {
                     )}
                   </div>
                 ) : (
-                  <Link to="/alert" onClick={closeMobileMenu} className="text-gray-700 hover:text-indigo-600 block px-3 py-2 rounded-md text-base font-medium">Alertas</Link>
+                  <Link to="/alert" onClick={closeMobileMenu} className="text-gray-700 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium">Alertas</Link>
                 )}
                 
                 <Link to="/report" onClick={closeMobileMenu} className="text-gray-700 hover:text-indigo-600 block px-3 py-2 rounded-md text-base font-medium">Reporte</Link>

@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import Swal from 'sweetalert2'
-import { showAlert } from '../../functions.jsx'
-import '../../Style/ViewAlert.css'
-import storage from '../../Storage/storage'
+import { showAlert } from '../functions.jsx'
+import storage from '../Storage/storage.jsx'
+import '../Style/ViewAlert.css'
 
 function ViewAlert() {
   const [alertas, setAlertas] = useState([])
@@ -14,12 +14,21 @@ function ViewAlert() {
   const navigate = useNavigate()
 
   useEffect(() => {
-    // Determinar si el usuario es admin
-    const user = storage.get('user')
-    if (user && typeof user.rol === 'string') {
-      setIsAdmin(user.rol.toLowerCase() === 'admin')
+    // Verificar rol de usuario
+    const user = storage.get('user');
+    console.log('Usuario desde storage:', user);
+    
+    if (user && user.rol) {
+      console.log('Rol del usuario:', user.rol);
+      const adminCheck = user.rol === 'admin' || user.rol === 'ADMIN';
+      setIsAdmin(adminCheck);
+    } else {
+      console.log('No hay usuario o no tiene rol');
+      setIsAdmin(false);
     }
+  }, []);
 
+  useEffect(() => {
     const load = async () => {
       try {
         const response = await fetch('http://localhost:8080/api/alertas/getAllAlert', {
@@ -44,7 +53,7 @@ function ViewAlert() {
 
   const nivelColor = (nivel) => {
     const n = (nivel || '').toLowerCase()
-    // Usamos fondos más oscuros y texto más claro
+   
     if (['rojo','critico','crítico'].includes(n)) return 'bg-red-900 text-red-200'
     if (['alto','alta'].includes(n)) return 'bg-orange-900 text-orange-200'
     if (['amarillo','medio','media'].includes(n)) return 'bg-yellow-900 text-yellow-200'
@@ -240,28 +249,30 @@ function ViewAlert() {
               </div>
 
               
-              {isAdmin && (
-                <div className="mt-4 pt-4 border-t border-gray-700 flex justify-end gap-2"> {/* Borde actualizado */}
-                  <button
-                    onClick={() => handleEdit(alerta.alertaId || alerta.idAlerta)}
-                    className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg transición-colors duración-200 flex items-center gap-2"
-                  >
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
-                      <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
-                    </svg>
-                    Editar
-                  </button>
-                  <button
-                    onClick={() => handleDelete(alerta.alertaId || alerta.idAlerta)}
-                    className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white text-sm font-medium rounded-lg transición-colors duración-200 flex items-center gap-2"
-                  >
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
-                      <path fillRule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clipRule="evenodd" />
-                    </svg>
-                    Eliminar
-                  </button>
-                </div>
-              )}
+              <div className="mt-4 pt-4 border-t border-gray-700 flex justify-end gap-2"> {/* Borde actualizado */}
+                {isAdmin && (
+                  <>
+                    <button
+                      onClick={() => handleEdit(alerta.alertaId || alerta.idAlerta)}
+                      className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition-colors duration-200 flex items-center gap-2"
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                        <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
+                      </svg>
+                      Editar
+                    </button>
+                    <button
+                      onClick={() => handleDelete(alerta.alertaId || alerta.idAlerta)}
+                      className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white text-sm font-medium rounded-lg transition-colors duration-200 flex items-center gap-2"
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                        <path fillRule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clipRule="evenodd" />
+                      </svg>
+                      Eliminar
+                    </button>
+                  </>
+                )}
+              </div>
             </article>
           ))
         )}

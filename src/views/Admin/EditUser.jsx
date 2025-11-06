@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import './EditUser.css';
+import '../../Style/EditUser.css';
 
 function EditUser() {
   const [usuarios, setUsuarios] = useState([]);
