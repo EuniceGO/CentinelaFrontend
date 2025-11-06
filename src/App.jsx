@@ -14,6 +14,9 @@ import Dashboard from './views/Dashboard'
 import ProtectedRoutes from './Components/ProtectedRoutes'
 import Region from './views/Admin/Region'
 import EditUser from './views/Admin/EditUser'
+import EmergenciaForm from './views/EmergenciaForm'
+import Emergencias from './views/Emergencias'
+import EmergenciaDetail from './views/EmergenciaDetail'
 
 
 
@@ -38,6 +41,9 @@ function App() {
             <Route path="/dashboard" element={<Dashboard />} />
           
             <Route path='/report' element={<ReportForm />} />
+            <Route path='/emergencia' element={<EmergenciaForm />} />
+            <Route path='/emergencias' element={<Emergencias />} />
+            <Route path='/emergencia/:id' element={<EmergenciaDetail />} />
 
             <Route path="/alert" element={<Alert />} />
             <Route path="/reports" element={<Reports />} />

@@ -74,6 +74,8 @@ function Navbar() {
                 <Link to="/home" className="text-gray-700 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium">Inicio</Link>
                 <Link to="/alert" className="text-gray-700 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium">Alerta</Link>
                 <Link to="/report" className="text-gray-700 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium">Reporte</Link>
+                <Link to="/emergencia" className="text-gray-700 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium">Emergencia</Link>
+                <Link to="/emergencias" className="text-gray-700 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium">Ver Emergencias</Link>
                 <Link to="/dashboard" className="text-gray-700 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium">Dashboard</Link>
                 <Link to="/reports" className="text-gray-700 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium">Ver Reportes</Link>
                 
@@ -125,6 +127,8 @@ function Navbar() {
                 <Link to="/home" onClick={closeMobileMenu} className="text-gray-700 hover:text-indigo-600 block px-3 py-2 rounded-md text-base font-medium">Inicio</Link>
                 <Link to="/alert" onClick={closeMobileMenu} className="text-gray-700 hover:text-indigo-600 block px-3 py-2 rounded-md text-base font-medium">Alertas</Link>
                 <Link to="/report" onClick={closeMobileMenu} className="text-gray-700 hover:text-indigo-600 block px-3 py-2 rounded-md text-base font-medium">Reporte</Link>
+                <Link to="/emergencia" onClick={closeMobileMenu} className="text-gray-700 hover:text-indigo-600 block px-3 py-2 rounded-md text-base font-medium">Emergencia</Link>
+                <Link to="/emergencias" onClick={closeMobileMenu} className="text-gray-700 hover:text-indigo-600 block px-3 py-2 rounded-md text-base font-medium">Ver Emergencias</Link>
                 <Link to="/dashboard" onClick={closeMobileMenu} className="text-gray-700 hover:text-indigo-600 block px-3 py-2 rounded-md text-base font-medium">Dashboard</Link>
                 <Link to="/reports" onClick={closeMobileMenu} className="text-gray-700 hover:text-indigo-600 block px-3 py-2 rounded-md text-base font-medium">Ver Reportes</Link>
                 
