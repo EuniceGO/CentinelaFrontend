@@ -10,7 +10,8 @@ import Logout from './views/Logout'
 import Inicio from './views/Home'
 import Dashboard from './views/Dashboard'
 import ProtectedRoutes from './Components/ProtectedRoutes'
-
+import Region from './views/Admin/Region'
+import EditUser from './views/Admin/EditUser'
 
 
 
@@ -37,6 +38,10 @@ function App() {
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path='/alert' element={<Alert />} />
             <Route path='/report' element={<ReportForm />} />
+            
+            {/* Rutas de administración */}
+            <Route path='/admin/edit-user' element={<EditUser />} />
+            <Route path='/admin/region' element={<Region />} />
 
           </Route>
 

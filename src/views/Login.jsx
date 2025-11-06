@@ -17,10 +17,14 @@ function Login() {
       )
       const user = res.data
       
+      
+
       if (user && user.contrasena) user.contrasena = null
       storage.set('user', user)
       storage.set('auth', true)
       showAlert('success', 'Login successful')
+
+      
       setTimeout(() => navigate('/home'), 800)
     } catch (error) {
       const msg = error?.response?.data?.message || 'Login failed'

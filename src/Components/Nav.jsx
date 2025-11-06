@@ -1,33 +1,45 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
+import storage from '../Storage/storage';
 
 function Navbar() {
   const navigate = useNavigate();
+  const location = useLocation(); 
   
 
   const [isAuthenticated, setIsAuthenticated] = useState(
     localStorage.getItem('auth') === 'true'
   );
 
+  const [isAdmin, setIsAdmin] = useState(false);
 
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
 
   useEffect(() => {
-    const handleStorageChange = () => {
-      setIsAuthenticated(localStorage.getItem('auth') === 'true');
+    const updateAuthState = () => {
+      const authStatus = localStorage.getItem('auth') === 'true';
+      setIsAuthenticated(authStatus);
+
+      const user = storage.get('user');
+      if (user && user.rol) {
+       
+        setIsAdmin(user.rol === 'admin' || user.rol === 'ADMIN' || user.role === 'admin' || user.role === 'ADMIN');
+      } else {
+        setIsAdmin(false);
+      }
     };
 
-    window.addEventListener('storage', handleStorageChange);
     
- 
-    handleStorageChange();
+    updateAuthState();
 
-  
+
+    window.addEventListener('storage', updateAuthState);
+
     return () => {
-      window.removeEventListener('storage', handleStorageChange);
+      window.removeEventListener('storage', updateAuthState);
     };
-  }, []); 
+  }, [location]); 
 
 
   const handleLogout = () => {
@@ -63,6 +75,15 @@ function Navbar() {
                 <Link to="/alert" className="text-gray-700 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium">Alerta</Link>
                 <Link to="/report" className="text-gray-700 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium">Reporte</Link>
                 <Link to="/dashboard" className="text-gray-700 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium">Dashboard</Link>
+                
+                {/* Enlaces exclusivos para administradores */}
+                {isAdmin && (
+                  <>
+                    <Link to="/admin/edit-user" className="text-gray-700 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium">Editar Usuarios</Link>
+                    <Link to="/admin/region" className="text-gray-700 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium">Regiones</Link>
+                  </>
+                )}
+                
                 <button
                   onClick={handleLogout}
                   className="bg-indigo-600 text-white hover:bg-indigo-700 px-4 py-2 rounded-md text-sm font-medium"
@@ -104,6 +125,15 @@ function Navbar() {
                 <Link to="/alert" onClick={closeMobileMenu} className="text-gray-700 hover:text-indigo-600 block px-3 py-2 rounded-md text-base font-medium">Alertas</Link>
                 <Link to="/report" onClick={closeMobileMenu} className="text-gray-700 hover:text-indigo-600 block px-3 py-2 rounded-md text-base font-medium">Reporte</Link>
                 <Link to="/dashboard" onClick={closeMobileMenu} className="text-gray-700 hover:text-indigo-600 block px-3 py-2 rounded-md text-base font-medium">Dashboard</Link>
+                
+                {/* Enlaces exclusivos para administradores en mobile */}
+                {isAdmin && (
+                  <>
+                    <Link to="/admin/edit-user" onClick={closeMobileMenu} className="text-gray-700 hover:text-indigo-600 block px-3 py-2 rounded-md text-base font-medium">Editar Usuarios</Link>
+                    <Link to="/admin/region" onClick={closeMobileMenu} className="text-gray-700 hover:text-indigo-600 block px-3 py-2 rounded-md text-base font-medium">Regiones</Link>
+                  </>
+                )}
+                
                 <button
                   onClick={handleLogout}
                   className="w-full text-left bg-indigo-600 text-white hover:bg-indigo-700 block px-3 py-2 rounded-md text-base font-medium"
