@@ -2,7 +2,7 @@ import React from 'react'
 
 function EditUser() {
   return (
-    <div>EditUser</div>
+    <div>EditUsuarios</div>
   )
 }
 
