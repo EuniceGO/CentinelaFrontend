@@ -12,7 +12,8 @@ import Logout from './views/Logout'
 import Inicio from './views/Home'
 import Dashboard from './views/Dashboard'
 import ProtectedRoutes from './Components/ProtectedRoutes'
-
+import Region from './views/Admin/Region'
+import EditUser from './views/Admin/EditUser'
 
 
 
@@ -35,10 +36,18 @@ function App() {
           <Route element={<ProtectedRoutes />}>
             <Route path="/home" element={<Inicio />} />
             <Route path="/dashboard" element={<Dashboard />} />
+          
+            <Route path='/report' element={<ReportForm />} />
+
             <Route path="/alert" element={<Alert />} />
-            <Route path="/report" element={<ReportForm />} />
             <Route path="/reports" element={<Reports />} />
             <Route path="/report/:id" element={<ReportDetail />} />
+            
+            {/* Rutas de administración */}
+            <Route path='/admin/edit-user' element={<EditUser />} />
+            <Route path='/admin/region' element={<Region />} />
+
+            
           </Route>
         </Routes>
       </BrowserRouter>

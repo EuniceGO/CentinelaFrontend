@@ -120,7 +120,6 @@ function Register() {
                 placeholder="Teléfono" />
             </div>
 
-            
             <div>
               <label htmlFor="region" className="sr-only">Región</label>
               <select
