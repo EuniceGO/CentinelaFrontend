@@ -16,6 +16,7 @@ function Navbar() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isAlertDropdownOpen, setIsAlertDropdownOpen] = useState(false);
   const [isReportDropdownOpen, setIsReportDropdownOpen] = useState(false);
+  const [isEmergencytDropdownOpen, setIsEmergencytDropdownOpen] = useState(false);
 
 
   useEffect(() => {
@@ -74,12 +75,30 @@ function Navbar() {
 
               <>
                 <Link to="/home" className="text-gray-700 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium">Inicio</Link>
-                <Link to="/alert" className="text-gray-700 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium">Alerta</Link>
-                <Link to="/report" className="text-gray-700 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium">Reporte</Link>
-                <Link to="/emergencia" className="text-gray-700 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium">Emergencia</Link>
-                <Link to="/emergencias" className="text-gray-700 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium">Ver Emergencias</Link>
-                <Link to="/dashboard" className="text-gray-700 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium">Dashboard</Link>
-                <Link to="/reports" className="text-gray-700 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium">Ver Reportes</Link>
+    
+
+                <div className="relative">
+                    <button
+                      type="button"
+                      onClick={() => setIsEmergencytDropdownOpen(!isEmergencytDropdownOpen)}
+                      aria-expanded={isEmergencytDropdownOpen}
+                      className="flex items-center text-gray-700 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium"
+                    >
+                      Emergencias
+                      <svg className="w-3 h-3 ml-1" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 10 6">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="m1 1 4 4 4-4" />
+                      </svg>
+                    </button>
+                    {isEmergencytDropdownOpen && (
+                      <div className="absolute left-0 mt-1 w-48 rounded-lg border bg-white shadow-lg divide-y divide-gray-100 z-50">
+                        <Link to="/emergencia" onClick={() => setIsEmergencytDropdownOpen(false)} className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">Emergencias </Link>
+                        <Link to="/emergencias" onClick={() => setIsEmergencytDropdownOpen(false)} className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">Ver Emergencias</Link>
+                      </div>
+                    )}
+                  </div>
+
+
+                
                 
                 {/* Alertas con submenú para admin */}
                 {isAdmin ? (

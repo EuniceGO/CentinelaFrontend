@@ -93,20 +93,16 @@ function CreateAlert() {
         descripcion: formData.descripcion.trim(),
         nivel: formData.nivel,
         region: {
-          // Debe ser 'regionId', igual que el @Id en tu clase Region.java
+          
           regionId: formData.region_id ? parseInt(formData.region_id) : null 
         },
         usuario: {
-          // Debe ser 'idUsuario', igual que el @Id en tu clase Usuario.java
+         
           usuarioId: parseInt(userId) 
         }
       };
 
-      console.log('🔍 userId antes de parseInt:', userId, 'tipo:', typeof userId);
-      console.log('🔍 region_id antes de parseInt:', formData.region_id, 'tipo:', typeof formData.region_id);
-      console.log('🔍 alertaData.usuario.idUsuario:', alertaData.usuario.idUsuario, 'tipo:', typeof alertaData.usuario.idUsuario);
-      console.log('🔍 alertaData.region.regionId:', alertaData.region.regionId, 'tipo:', typeof alertaData.region.regionId);
-      console.log('📦 OBJETO COMPLETO A ENVIAR:', JSON.stringify(alertaData, null, 2));
+
 
       const response = await axios.post('http://localhost:8080/api/alertas/createAlert', alertaData);
 
