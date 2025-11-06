@@ -16,8 +16,7 @@ export default function ReportForm() {
   const [descripcion, setDescripcion] = useState('')
   const [estado, setEstado] = useState('Activo')
   const [position, setPosition] = useState(null)
-  const [file, setFile] = useState(null)
-  const [preview, setPreview] = useState(null)
+  const [fotoUrl, setFotoUrl] = useState('')
   const mapRef = useRef(null)
   const markerRef = useRef(null)
   const defaultCenter = [13.9946, -89.5597] // Santa Ana, El Salvador
@@ -31,14 +30,6 @@ export default function ReportForm() {
       )
     }
   }, [])
-
-  // Mostrar vista previa de la imagen
-  useEffect(() => {
-    if (!file) return
-    const reader = new FileReader()
-    reader.onload = (e) => setPreview(e.target.result)
-    reader.readAsDataURL(file)
-  }, [file])
 
   // Inicializar mapa con Leaflet
   useEffect(() => {
@@ -91,14 +82,26 @@ export default function ReportForm() {
     }
 
     // 🔹 Obtener el usuario guardado en sesión
-    const usuarioSesion = JSON.parse(localStorage.getItem('usuario'))
+    let usuarioSesion = null
+    try {
+      const storageMod = await import('../Storage/storage')
+      usuarioSesion = storageMod.default.get('user') || storageMod.default.get('usuario')
+    } catch (err) {
+      usuarioSesion = JSON.parse(localStorage.getItem('user') || localStorage.getItem('usuario') || 'null')
+    }
 
-    if (!usuarioSesion || !usuarioSesion.usuarioId) {
-      alert('No se encontró el usuario en sesión. Inicia sesión nuevamente.')
+    const getUserId = (u) => {
+      if (!u) return null
+      return u.id || u.usuarioId || u.usuario_id || u.user_id || u._id || u.id_usuario || null
+    }
+
+    const usuarioId = getUserId(usuarioSesion)
+    if (!usuarioId) {
+      alert('No se encontró el usuario en sesión (id). Inicia sesión nuevamente.')
       return
     }
 
-    // 🔹 Crear el cuerpo de la petición
+    // 🔹 Crear el cuerpo de la petición (como lo espera el backend)
     const payload = {
       tipo,
       descripcion,
@@ -106,8 +109,9 @@ export default function ReportForm() {
       latitud: Number(position[0]),
       longitud: Number(position[1]),
       usuario: {
-        usuarioId: usuarioSesion.usuarioId, // ✅ necesario para tu backend
+        usuarioId: usuarioId
       },
+      fotoUrl: fotoUrl || null // 👈 campo de URL opcional
     }
 
     try {
@@ -119,8 +123,7 @@ export default function ReportForm() {
       setTipo('')
       setDescripcion('')
       setEstado('Activo')
-      setFile(null)
-      setPreview(null)
+      setFotoUrl('')
     } catch (err) {
       console.error('Error al enviar:', err)
       alert('Hubo un error al enviar el reporte ❌')
@@ -134,13 +137,19 @@ export default function ReportForm() {
         <div className="col-md-6">
           <form onSubmit={handleSubmit}>
             <div className="mb-3">
-              <label className="form-label">Tipo</label>
-              <input
-                className="form-control"
+              <label className="form-label">Tipo de reporte</label>
+              <select
+                className="form-select"
                 value={tipo}
                 onChange={(e) => setTipo(e.target.value)}
-                placeholder="Ej: Inundación, Deslizamiento"
-              />
+                required
+              >
+                <option value="">-- Selecciona un tipo --</option>
+                <option value="Calle_inundada">Calle inundada</option>
+                <option value="Paso_cerrado">Paso cerrado</option>
+                <option value="Refugio_disponible">Refugio disponible</option>
+                <option value="Otro">Otro</option>
+              </select>
             </div>
 
             <div className="mb-3">
@@ -166,15 +175,24 @@ export default function ReportForm() {
               </select>
             </div>
 
+            {/* ✅ Campo para ingresar URL de la imagen */}
             <div className="mb-3">
-              <label className="form-label">Foto (opcional)</label>
+              <label className="form-label">Foto (URL opcional)</label>
               <input
-                type="file"
+                type="url"
                 className="form-control"
-                accept="image/*"
-                onChange={(e) => setFile(e.target.files?.[0] ?? null)}
+                placeholder="https://ejemplo.com/imagen.jpg"
+                value={fotoUrl}
+                onChange={(e) => setFotoUrl(e.target.value)}
               />
-              {preview && <img src={preview} alt="preview" className="img-fluid mt-2" />}
+              {fotoUrl && (
+                <img
+                  src={fotoUrl}
+                  alt="preview"
+                  className="img-fluid mt-2"
+                  style={{ maxHeight: '200px', objectFit: 'cover' }}
+                />
+              )}
             </div>
 
             <div className="mb-3">
