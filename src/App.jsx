@@ -17,6 +17,9 @@ import EditUser from './views/Admin/EditUser'
 import EmergenciaForm from './views/EmergenciaForm'
 import Emergencias from './views/Emergencias'
 import EmergenciaDetail from './views/EmergenciaDetail'
+import CreateAlert from './views/Admin/CreateAlert'
+import ViewAlert from './views/Admin/ViewAlert'
+
 
 
 
@@ -27,7 +30,7 @@ function App() {
       <BrowserRouter>
        
         
-        <Nav />
+       
         <Routes>
           {/* Public routes */}
           <Route path="/" element={<Login />} />
@@ -35,6 +38,10 @@ function App() {
           <Route path="/register" element={<Register />} />
           <Route path="/logout" element={<Logout />} />
 
+          
+        </Routes>
+          <Nav />
+        <Routes>
           {/* Protected routes */}
           <Route element={<ProtectedRoutes />}>
             <Route path="/home" element={<Inicio />} />
@@ -52,6 +59,8 @@ function App() {
             {/* Rutas de administración */}
             <Route path='/admin/edit-user' element={<EditUser />} />
             <Route path='/admin/region' element={<Region />} />
+            <Route path='/admin/create-alert' element={<CreateAlert />} />
+            <Route path='/admin/view-alert' element={<ViewAlert />} />
 
             
           </Route>

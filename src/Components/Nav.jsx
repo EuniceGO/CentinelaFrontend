@@ -14,6 +14,9 @@ function Navbar() {
   const [isAdmin, setIsAdmin] = useState(false);
 
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isAlertDropdownOpen, setIsAlertDropdownOpen] = useState(false);
+  const [isReportDropdownOpen, setIsReportDropdownOpen] = useState(false);
+  const [isEmergencytDropdownOpen, setIsEmergencytDropdownOpen] = useState(false);
 
 
   useEffect(() => {
@@ -72,18 +75,84 @@ function Navbar() {
 
               <>
                 <Link to="/home" className="text-gray-700 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium">Inicio</Link>
-                <Link to="/alert" className="text-gray-700 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium">Alerta</Link>
-                <Link to="/report" className="text-gray-700 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium">Reporte</Link>
-                <Link to="/emergencia" className="text-gray-700 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium">Emergencia</Link>
-                <Link to="/emergencias" className="text-gray-700 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium">Ver Emergencias</Link>
-                <Link to="/dashboard" className="text-gray-700 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium">Dashboard</Link>
-                <Link to="/reports" className="text-gray-700 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium">Ver Reportes</Link>
+    
+
+                <div className="relative">
+                    <button
+                      type="button"
+                      onClick={() => setIsEmergencytDropdownOpen(!isEmergencytDropdownOpen)}
+                      aria-expanded={isEmergencytDropdownOpen}
+                      className="flex items-center text-gray-700 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium"
+                    >
+                      Emergencias
+                      <svg className="w-3 h-3 ml-1" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 10 6">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="m1 1 4 4 4-4" />
+                      </svg>
+                    </button>
+                    {isEmergencytDropdownOpen && (
+                      <div className="absolute left-0 mt-1 w-48 rounded-lg border bg-white shadow-lg divide-y divide-gray-100 z-50">
+                        <Link to="/emergencia" onClick={() => setIsEmergencytDropdownOpen(false)} className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">Emergencias </Link>
+                        <Link to="/emergencias" onClick={() => setIsEmergencytDropdownOpen(false)} className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">Ver Emergencias</Link>
+                      </div>
+                    )}
+                  </div>
+
+
+                
+                
+                {/* Alertas con submenú para admin */}
+                {isAdmin ? (
+                  <div className="relative">
+                    <button
+                      type="button"
+                      onClick={() => setIsAlertDropdownOpen(!isAlertDropdownOpen)}
+                      aria-expanded={isAlertDropdownOpen}
+                      className="flex items-center text-gray-700 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium"
+                    >
+                      Alertas
+                      <svg className="w-3 h-3 ml-1" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 10 6">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="m1 1 4 4 4-4" />
+                      </svg>
+                    </button>
+                    {isAlertDropdownOpen && (
+                      <div className="absolute left-0 mt-1 w-48 rounded-lg border bg-white shadow-lg divide-y divide-gray-100 z-50">
+                        <Link to="/admin/view-alert" onClick={() => setIsAlertDropdownOpen(false)} className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">Ver Alertas </Link>
+                        <Link to="/admin/create-alert" onClick={() => setIsAlertDropdownOpen(false)} className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">Crear Alerta</Link>
+                      </div>
+                    )}
+                  </div>
+                ) : (
+                  <Link to="/alert" className="text-gray-700 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium">Alerta</Link>
+                )}
+                
+
+                <div className="relative">
+                    <button
+                      type="button"
+                      onClick={() => setIsReportDropdownOpen(!isReportDropdownOpen)}
+                      aria-expanded={isReportDropdownOpen}
+                      className="flex items-center text-gray-700 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium"
+                    >
+                      Reportes
+                      <svg className="w-3 h-3 ml-1" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 10 6">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="m1 1 4 4 4-4" />
+                      </svg>
+                    </button>
+                    {isReportDropdownOpen && (
+                      <div className="absolute left-0 mt-1 w-48 rounded-lg border bg-white shadow-lg divide-y divide-gray-100 z-50">
+                        <Link to="/report" onClick={() => setIsReportDropdownOpen(false)} className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">Reporte </Link>
+                        <Link to="/reports" onClick={() => setIsReportDropdownOpen(false)} className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">Ver Reportes</Link>
+                      </div>
+                    )}
+                  </div>
+               
+
                 
                 {/* Enlaces exclusivos para administradores */}
                 {isAdmin && (
                   <>
-                    <Link to="/admin/edit-user" className="text-gray-700 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium">Editar Usuarios</Link>
-                    <Link to="/admin/region" className="text-gray-700 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium">Regiones</Link>
+                    <Link to="/admin/edit-user" className="text-gray-700 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium">Usuarios</Link>
+                    
                   </>
                 )}
                 
@@ -125,7 +194,33 @@ function Navbar() {
 
               <>
                 <Link to="/home" onClick={closeMobileMenu} className="text-gray-700 hover:text-indigo-600 block px-3 py-2 rounded-md text-base font-medium">Inicio</Link>
-                <Link to="/alert" onClick={closeMobileMenu} className="text-gray-700 hover:text-indigo-600 block px-3 py-2 rounded-md text-base font-medium">Alertas</Link>
+                
+                
+                {isAdmin ? (
+                  <div className="relative">
+                    <button
+                      type="button"
+                      onClick={() => setIsAlertDropdownOpen(!isAlertDropdownOpen)}
+                      aria-expanded={isAlertDropdownOpen}
+                      className="flex w-full items-center justify-between px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:bg-gray-100"
+                    >
+                      Alertas
+                      <svg className="w-3 h-3" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 10 6">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="m1 1 4 4 4-4" />
+                      </svg>
+                    </button>
+                    {isAlertDropdownOpen && (
+                      <div className="mt-1 rounded-lg border bg-white shadow-sm divide-y divide-gray-100">
+                        <Link to="/alert" onClick={() => { setIsAlertDropdownOpen(false); closeMobileMenu(); }} className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">Ver Alertas Usuario</Link>
+                        <Link to="/admin/create-alert" onClick={() => { setIsAlertDropdownOpen(false); closeMobileMenu(); }} className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">Crear Alerta</Link>
+                        <Link to="/admin/view-alert" onClick={() => { setIsAlertDropdownOpen(false); closeMobileMenu(); }} className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">Ver Alertas Admin</Link>
+                      </div>
+                    )}
+                  </div>
+                ) : (
+                  <Link to="/alert" onClick={closeMobileMenu} className="text-gray-700 hover:text-indigo-600 block px-3 py-2 rounded-md text-base font-medium">Alertas</Link>
+                )}
+                
                 <Link to="/report" onClick={closeMobileMenu} className="text-gray-700 hover:text-indigo-600 block px-3 py-2 rounded-md text-base font-medium">Reporte</Link>
                 <Link to="/emergencia" onClick={closeMobileMenu} className="text-gray-700 hover:text-indigo-600 block px-3 py-2 rounded-md text-base font-medium">Emergencia</Link>
                 <Link to="/emergencias" onClick={closeMobileMenu} className="text-gray-700 hover:text-indigo-600 block px-3 py-2 rounded-md text-base font-medium">Ver Emergencias</Link>
