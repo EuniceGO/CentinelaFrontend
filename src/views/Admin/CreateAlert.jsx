@@ -106,7 +106,7 @@ function CreateAlert() {
       });
       
       setTimeout(() => {
-        navigate('/admin/view-alert'); // Asegúrate que esta ruta sea correcta
+        navigate('/admin/view-alert'); 
       }, 1500);
       
     } catch (error) {
@@ -118,11 +118,11 @@ function CreateAlert() {
   };
 
   return (
-    // --- FONDO GENERAL OSCURO ---
+
     <div className="min-h-screen bg-gray-900 py-8 px-4 sm:px-6 lg:px-8">
       <div className="max-w-4xl mx-auto">
         
-        {/* --- TARJETA DE FORMULARIO CON TUS ESTILOS --- */}
+
         <div className="bg-gray-800 rounded-md overflow-hidden border border-gray-700 hover:shadow-lg transition-shadow p-6">
           <h2 className="text-2xl font-bold text-white mb-6">Crear Nueva Alerta</h2>
           
@@ -138,7 +138,6 @@ function CreateAlert() {
                 name="titulo"
                 value={formData.titulo}
                 onChange={handleChange}
-                // Estilos para input oscuro
                 className="w-full px-4 py-2 bg-gray-700 border border-gray-600 text-white rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition"
                 placeholder="Ej: Alerta de inundación"
                 required
@@ -156,7 +155,7 @@ function CreateAlert() {
                 value={formData.descripcion}
                 onChange={handleChange}
                 rows="4"
-                // Estilos para textarea oscuro
+
                 className="w-full px-4 py-2 bg-gray-700 border border-gray-600 text-white rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition"
                 placeholder="Describa los detalles de la alerta..."
                 required
@@ -173,7 +172,7 @@ function CreateAlert() {
                 name="nivel"
                 value={formData.nivel}
                 onChange={handleChange}
-                // Estilos para select oscuro
+        
                 className="w-full px-4 py-2 bg-gray-700 border border-gray-600 text-white rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition"
                 required
               >
@@ -195,7 +194,7 @@ function CreateAlert() {
                 name="region_id"
                 value={formData.region_id}
                 onChange={handleChange}
-                // Estilos para select oscuro
+
                 className="w-full px-4 py-2 bg-gray-700 border border-gray-600 text-white rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition"
                 disabled={loadingRegiones}
               >
@@ -229,7 +228,7 @@ function CreateAlert() {
           </form>
         </div>
 
-        {/* --- INFORMACIÓN ADICIONAL EN MODO OSCURO --- */}
+   
         <div className="mt-6 p-4 bg-gray-700 rounded-lg border border-gray-600">
           <h3 className="text-sm font-semibold text-gray-200 mb-2">Información</h3>
           <ul className="text-sm text-gray-300 space-y-1">
