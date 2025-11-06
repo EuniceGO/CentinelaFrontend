@@ -13,7 +13,7 @@ export default function EmergenciaDetail() {
     const fetchOne = async () => {
       setLoading(true)
       try {
-        const res = await axios.get(`http://localhost:8080/api/emergencias/${id}`)
+        const res = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/emergencias/${id}`)
         setEmergencia(res.data)
       } catch (err) {
         console.error('Error cargando emergencia', err)

@@ -41,7 +41,7 @@ function EditAlert() {
     const cargarAlerta = async () => {
       try {
         setLoadingData(true);
-        const response = await axios.get(`http://localhost:8080/api/alertas/${id}`);
+        const response = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/alertas/${id}`);
         const alerta = response.data;
         
         setFormData({
@@ -69,7 +69,7 @@ function EditAlert() {
   useEffect(() => {
     const cargarRegiones = async () => {
       try {
-        const response = await axios.get('http://localhost:8080/api/regiones');
+        const response = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/regiones`);
         setRegiones(response.data || []);
       } catch (error) {
         console.error('Error al cargar regiones:', error);
@@ -119,7 +119,7 @@ function EditAlert() {
       };
 
       const response = await axios.put(
-        `http://localhost:8080/api/alertas/${id}`, 
+        `${import.meta.env.VITE_BACKEND_URL}/api/alertas/${id}`, 
         alertaData
       );
 

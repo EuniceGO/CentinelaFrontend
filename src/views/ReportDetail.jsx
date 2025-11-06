@@ -55,7 +55,7 @@ export default function ReportDetail() {
       if (report) return;
       try {
         setLoading(true);
-        const res = await axios.get(`${API_BASE_URL}/reportes/${id}`);
+        const res = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/reportes/${id}`);
         setReport(res.data);
       } catch (err) {
         console.error('Error fetching report:', err);

@@ -8,7 +8,7 @@ export default function Emergencias() {
   useEffect(() => {
     const fetchEmergencias = async () => {
       try {
-        const res = await axios.get('http://localhost:8080/api/emergencias')
+        const res = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/emergencias`)
         setEmergencias(res.data || [])
       } catch (err) {
         console.error('Error cargando emergencias', err)

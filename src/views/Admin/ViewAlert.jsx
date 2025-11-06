@@ -22,7 +22,7 @@ function ViewAlert() {
 
     const load = async () => {
       try {
-        const response = await fetch('http://localhost:8080/api/alertas/getAllAlert', {
+        const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/alertas/getAllAlert`, {
           headers: {
             'Content-Type': 'application/json'
           }
@@ -72,7 +72,7 @@ function ViewAlert() {
 
     if (result.isConfirmed) {
       try {
-        const response = await fetch(`http://localhost:8080/api/alertas/${alertaId}`, {
+        const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/alertas/${alertaId}`, {
           method: 'DELETE',
           headers: {
             'Content-Type': 'application/json'

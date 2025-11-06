@@ -88,7 +88,7 @@ export default function EmergenciaForm() {
 
     try {
       setEnviando(true)
-      const res = await axios.post('http://localhost:8080/api/emergencias', payload)
+      const res = await axios.post( `${import.meta.env.VITE_BACKEND_URL}/api/emergencias`, payload)
       console.log('Emergencia creada:', res.data)
       alert('Emergencia enviada correctamente')
       setMensaje('')
