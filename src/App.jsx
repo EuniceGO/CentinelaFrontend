@@ -20,22 +20,25 @@ function App() {
     <>
       <BrowserRouter>
        
-       <Nav />
         
        <Routes>
+
 
         <Route path="/" element={<Login />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
+         
+       </Routes>
+        <Nav />
+       <Routes>
+          <Route element={<ProtectedRoutes />}>
 
-        <Route element={<ProtectedRoutes />}>
+            <Route path='/home' element={<Inicio />} /> 
+            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path='/alert' element={<Alert />} />
+            <Route path='/report' element={<ReportForm />} />
 
-          <Route path='/home' element={<Inicio />} /> 
-          <Route path="/dashboard" element={<Dashboard />} />
-          <Route path='/alert' element={<Alert />} />
-          <Route path='/report' element={<ReportForm />} />
-
-        </Route>
+          </Route>
 
        </Routes>
       </BrowserRouter>
