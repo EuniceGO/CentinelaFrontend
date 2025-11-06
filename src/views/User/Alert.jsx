@@ -2,7 +2,10 @@ import React from 'react'
 
 function Alert() {
   return (
-    <div>Alert</div>
+    <div>Alert
+        <h1>Informacion de las alertas</h1>
+    </div>
+    
   )
 }
 
