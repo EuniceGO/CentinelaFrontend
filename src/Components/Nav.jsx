@@ -15,6 +15,7 @@ function Navbar() {
 
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isAlertDropdownOpen, setIsAlertDropdownOpen] = useState(false);
+  const [isReportDropdownOpen, setIsReportDropdownOpen] = useState(false);
 
 
   useEffect(() => {
@@ -99,14 +100,34 @@ function Navbar() {
                   <Link to="/alert" className="text-gray-700 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium">Alerta</Link>
                 )}
                 
-                <Link to="/report" className="text-gray-700 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium">Reporte</Link>
+
+                <div className="relative">
+                    <button
+                      type="button"
+                      onClick={() => setIsReportDropdownOpen(!isReportDropdownOpen)}
+                      aria-expanded={isReportDropdownOpen}
+                      className="flex items-center text-gray-700 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium"
+                    >
+                      Reportes
+                      <svg className="w-3 h-3 ml-1" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 10 6">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="m1 1 4 4 4-4" />
+                      </svg>
+                    </button>
+                    {isReportDropdownOpen && (
+                      <div className="absolute left-0 mt-1 w-48 rounded-lg border bg-white shadow-lg divide-y divide-gray-100 z-50">
+                        <Link to="/report" onClick={() => setIsReportDropdownOpen(false)} className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">Reporte </Link>
+                        <Link to="/reports" onClick={() => setIsReportDropdownOpen(false)} className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">Ver Reportes</Link>
+                      </div>
+                    )}
+                  </div>
+               
 
                 
                 {/* Enlaces exclusivos para administradores */}
                 {isAdmin && (
                   <>
-                    <Link to="/admin/edit-user" className="text-gray-700 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium">Editar Usuarios</Link>
-                    <Link to="/admin/region" className="text-gray-700 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium">Regiones</Link>
+                    <Link to="/admin/edit-user" className="text-gray-700 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium">Usuarios</Link>
+                    
                   </>
                 )}
                 
@@ -177,6 +198,7 @@ function Navbar() {
                 
                 <Link to="/report" onClick={closeMobileMenu} className="text-gray-700 hover:text-indigo-600 block px-3 py-2 rounded-md text-base font-medium">Reporte</Link>
                 <Link to="/dashboard" onClick={closeMobileMenu} className="text-gray-700 hover:text-indigo-600 block px-3 py-2 rounded-md text-base font-medium">Dashboard</Link>
+                <Link to="/reports" onClick={closeMobileMenu} className="text-gray-700 hover:text-indigo-600 block px-3 py-2 rounded-md text-base font-medium">Ver Reportes</Link>
                 
                 {/* Enlaces exclusivos para administradores en mobile */}
                 {isAdmin && (

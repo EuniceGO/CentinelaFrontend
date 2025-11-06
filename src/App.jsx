@@ -6,6 +6,8 @@ import Login from './views/Login'
 import Register from './views/Register'
 import Alert from './views/User/Alert'
 import ReportForm from './views/ReportForm'
+import Reports from './views/Reports'
+import ReportDetail from './views/ReportDetail'
 import Logout from './views/Logout'
 import Inicio from './views/Home'
 import Dashboard from './views/Dashboard'
@@ -25,22 +27,28 @@ function App() {
       <BrowserRouter>
        
         
-       <Routes>
+       
+        <Routes>
+          {/* Public routes */}
+          <Route path="/" element={<Login />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
+          <Route path="/logout" element={<Logout />} />
 
-
-        <Route path="/" element={<Login />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
-         
-       </Routes>
-        <Nav />
-       <Routes>
+          
+        </Routes>
+          <Nav />
+        <Routes>
+          {/* Protected routes */}
           <Route element={<ProtectedRoutes />}>
-
-            <Route path='/home' element={<Inicio />} /> 
+            <Route path="/home" element={<Inicio />} />
             <Route path="/dashboard" element={<Dashboard />} />
-            <Route path='/alert' element={<Alert />} />
+          
             <Route path='/report' element={<ReportForm />} />
+
+            <Route path="/alert" element={<Alert />} />
+            <Route path="/reports" element={<Reports />} />
+            <Route path="/report/:id" element={<ReportDetail />} />
             
             {/* Rutas de administración */}
             <Route path='/admin/edit-user' element={<EditUser />} />
@@ -48,9 +56,9 @@ function App() {
             <Route path='/admin/create-alert' element={<CreateAlert />} />
             <Route path='/admin/view-alert' element={<ViewAlert />} />
 
+            
           </Route>
-
-       </Routes>
+        </Routes>
       </BrowserRouter>
     </>
   )

@@ -38,12 +38,12 @@ function CreateAlert() {
   }, [navigate]);
 
   const [formData, setFormData] = useState({
-    titulo: '',
-    descripcion: '',
-    nivel: '',
-    ubicacion: '',
-    id_usuario: ''
-
+        region_id: '',
+         titulo: '',
+         descripcion: '',
+         nivel: '',
+         id_usuario: '',
+         fecha_alerta: ''
   });
 
   useEffect(() => {
@@ -72,38 +72,52 @@ function CreateAlert() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
 
-    if (!formData.titulo || !formData.descripcion || !formData.tipo || !formData.nivel) {
+
+    if (!formData.titulo || !formData.descripcion || !formData.nivel) {
       showAlert('Por favor complete todos los campos obligatorios', 'warning');
       return;
     }
 
     if (!userId) {
-      showAlert('No se pudo obtener el ID del usuario', 'error');
+      showAlert('No se pudo obtener el ID del usuario. Por favor inicie sesión nuevamente.', 'error');
       return;
     }
 
     setLoading(true);
     
     try {
+
       const alertaData = {
-        ...formData,
-        id_usuario: userId,
-       
+        titulo: formData.titulo.trim(),
+        descripcion: formData.descripcion.trim(),
+        nivel: formData.nivel,
+        region: {
+          // Debe ser 'regionId', igual que el @Id en tu clase Region.java
+          regionId: formData.region_id ? parseInt(formData.region_id) : null 
+        },
+        usuario: {
+          // Debe ser 'idUsuario', igual que el @Id en tu clase Usuario.java
+          usuarioId: parseInt(userId) 
+        }
       };
 
-      await axios.post('http://localhost:8080/api/alertas/createAlert', alertaData);
-      
+      console.log('🔍 userId antes de parseInt:', userId, 'tipo:', typeof userId);
+      console.log('🔍 region_id antes de parseInt:', formData.region_id, 'tipo:', typeof formData.region_id);
+      console.log('🔍 alertaData.usuario.idUsuario:', alertaData.usuario.idUsuario, 'tipo:', typeof alertaData.usuario.idUsuario);
+      console.log('🔍 alertaData.region.regionId:', alertaData.region.regionId, 'tipo:', typeof alertaData.region.regionId);
+      console.log('📦 OBJETO COMPLETO A ENVIAR:', JSON.stringify(alertaData, null, 2));
+
+      const response = await axios.post('http://localhost:8080/api/alertas/createAlert', alertaData);
+
       showAlert('Alerta creada exitosamente', 'success');
       
-     
+      // Limpiar formulario
       setFormData({
-         titulo: '',
+        titulo: '',
         descripcion: '',
         nivel: '',
-        ubicacion: '',
-        id_usuario: ''
+        region_id: ''
       });
 
       
@@ -177,10 +191,10 @@ function CreateAlert() {
                 required
               >
                 <option value="">Seleccione un nivel</option>
-                <option value="BAJO">Bajo</option>
-                <option value="MEDIO">Medio</option>
-                <option value="ALTO">Alto</option>
-                <option value="CRITICO">Crítico</option>
+                <option value="Verde">Verde</option>
+                <option value="Amarillo">Amarillo</option>
+                <option value="Naranja">Naranja</option>
+                <option value="Rojo">Rojo</option>
               </select>
             </div>
           </div>
@@ -189,13 +203,13 @@ function CreateAlert() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {/* Ubicación */}
             <div>
-              <label htmlFor="ubicacion" className="block text-sm font-medium text-gray-700 mb-2">
+              <label htmlFor="region_id" className="block text-sm font-medium text-gray-700 mb-2">
                 Ubicación/Región
               </label>
               <select
-                id="ubicacion"
-                name="ubicacion"
-                value={formData.ubicacion}
+                id="region_id"
+                name="region_id"
+                value={formData.region_id}
                 onChange={handleChange}
                 className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
                 disabled={loadingRegiones}
