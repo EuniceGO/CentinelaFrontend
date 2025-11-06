@@ -1,0 +1,21 @@
+.container-alert {
+  min-height: 100vh;
+  padding: 2rem 1rem;
+  box-sizing: border-box;
+}
+
+.alert-list {
+  width: 100%;
+  max-width: 900px;
+  margin: 0 auto; /* centrado horizontal */
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem; 
+}
+
+.container-alert article {
+  width: 100%;
+  max-width: 100%;
+  margin: 0 auto; 
+}
+

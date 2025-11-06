@@ -19,6 +19,7 @@ import Emergencias from './views/Emergencias'
 import EmergenciaDetail from './views/EmergenciaDetail'
 import CreateAlert from './views/Admin/CreateAlert'
 import ViewAlert from './views/Admin/ViewAlert'
+import EditAlert from './views/Admin/EditAlert'
 
 
 
@@ -61,6 +62,7 @@ function App() {
             <Route path='/admin/region' element={<Region />} />
             <Route path='/admin/create-alert' element={<CreateAlert />} />
             <Route path='/admin/view-alert' element={<ViewAlert />} />
+            <Route path='/admin/alertas/editar/:id' element={<EditAlert />} />
 
             
           </Route>
