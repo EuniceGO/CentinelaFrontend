@@ -115,7 +115,7 @@ export default function ReportForm() {
     }
 
     try {
-      const response = await axios.post('http://localhost:8080/api/reportes', payload)
+      const response = await axios.post(`${import.meta.env.VITE_BACKEND_URL}/api/reportes`, payload)
       console.log('Respuesta del servidor:', response.data)
       alert('Reporte enviado exitosamente ✅')
 
