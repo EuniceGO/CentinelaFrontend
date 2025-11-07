@@ -14,6 +14,8 @@ function Login() {
     try {
       const res = await axios.post(`${import.meta.env.VITE_BACKEND_URL}/api/usuarios/login`, { correo, contrasena },
         { withCredentials: true }
+        
+      
       )
       const user = res.data
       

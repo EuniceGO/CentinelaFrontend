@@ -134,7 +134,7 @@ export default function Reports() {
   const fetchReports = useCallback(async () => {
     try {
       setLoading(true);
-      const res = await axios.get('http://localhost:8080/api/reportes');
+      const res = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/reportes`);
       setReports(res.data || []);
       setError(null);
     } catch (err) {
@@ -164,7 +164,7 @@ export default function Reports() {
     if (!window.confirm('⚠️ ¿Estás seguro de que deseas eliminar este reporte?\n\nEsta acción no se puede deshacer.')) return;
     
     try {
-      await axios.delete(`http://localhost:8080/api/reportes/${id}`);
+      await axios.delete(`${import.meta.env.VITE_BACKEND_URL}/api/reportes/${id}`);
       setReports(prevReports => prevReports.filter(r => getReportId(r) !== id));
       alert('✅ Reporte eliminado exitosamente');
     } catch (err) {
@@ -202,7 +202,7 @@ export default function Reports() {
         longitud: lng,
       };
 
-      await axios.put(`http://localhost:8080/api/reportes/${editingReport.id}`, updateData);
+      await axios.put(`${import.meta.env.VITE_BACKEND_URL}/api/reportes/${editingReport.id}`, updateData);
       
       setReports(prevReports => prevReports.map(r => {
         if (getReportId(r) === editingReport.id) {

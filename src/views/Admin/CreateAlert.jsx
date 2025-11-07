@@ -45,7 +45,7 @@ function CreateAlert() {
     const cargarRegiones = async () => {
       setLoadingRegiones(true);
       try {
-        const response = await axios.get('http://localhost:8080/api/regiones');
+        const response = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/regiones`);
         setRegiones(response.data || []);
       } catch (error) {
         console.error('Error al cargar regiones:', error);
@@ -93,7 +93,7 @@ function CreateAlert() {
          }
       };
 
-      const response = await axios.post('http://localhost:8080/api/alertas/createAlert', alertaData);
+      const response = await axios.post(`${import.meta.env.VITE_BACKEND_URL}/api/alertas/createAlert`, alertaData);
 
       showAlert('Alerta creada exitosamente', 'success');
       
