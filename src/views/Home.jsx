@@ -20,8 +20,8 @@ function Home() {
     const fetchData = async () => {
       try {
         const [eRes, rRes] = await Promise.all([
-          axios.get('http://localhost:8080/api/emergencias'),
-          axios.get('http://localhost:8080/api/reportes'),
+          axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/emergencias`),
+          axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/reportes`),
         ]);
 
   setEmergencias(Array.isArray(eRes.data) ? eRes.data.slice(0, HOME_LIMIT) : []);

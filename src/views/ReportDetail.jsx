@@ -4,7 +4,7 @@ import axios from 'axios';
 import storage from '../Storage/storage';
 
 // URL base de la API
-const API_BASE_URL = 'http://localhost:8080/api';
+const API_BASE_URL = `${import.meta.env.VITE_BACKEND_URL}/api`;
 
 /**
  * Componente para mostrar los detalles de un Reporte.
