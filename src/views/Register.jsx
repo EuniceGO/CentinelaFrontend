@@ -24,7 +24,7 @@ function Register() {
     const fetchRegiones = async () => {
       try {
         const response = await axios.get(
-          'http://localhost:8080/api/regiones',
+          `${import.meta.env.VITE_BACKEND_URL}/api/regiones`,
           { withCredentials: false }
         )
         setListaRegiones(response.data)
@@ -55,7 +55,7 @@ function Register() {
       }
 
       await axios.post(
-        'http://localhost:8080/api/usuarios/createUser', 
+        `${import.meta.env.VITE_BACKEND_URL}/api/usuarios/createUser`, 
         payload,
         { withCredentials: false }
       )

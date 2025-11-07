@@ -34,7 +34,7 @@ function Home() {
   }, []);
 
   const renderCard = (item, isReporte = true) => {
-    const fotoSrc = isReporte ? (item.fotoUrl || (item.fotoId ? `http://localhost:8080/api/fotos/${item.fotoId}` : null)) : null;
+    const fotoSrc = isReporte ? (item.fotoUrl || (item.fotoId ? `${import.meta.env.VITE_BACKEND_URL}/api/fotos/${item.fotoId}` : null)) : null;
     const id = item.reporteId || item.emergenciaId || item.id
     const to = isReporte ? `/report/${id}` : `/emergencia/${id}`
     return (

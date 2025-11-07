@@ -21,7 +21,7 @@ function EditUser() {
   // Función para cargar todos los usuarios
   const cargarUsuarios = async () => {
     try {
-      const response = await axios.get('http://localhost:8080/api/usuarios', {
+      const response = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/usuarios`, {
         withCredentials: true
       });
       
@@ -46,10 +46,10 @@ function EditUser() {
 
     try {
       console.log('Cambiando rol:', { usuarioId, nuevoRol }); // Debug
-      console.log('URL:', `http://localhost:8080/api/usuarios/${usuarioId}/rol`); // Debug URL
+      console.log('URL:', `${import.meta.env.VITE_BACKEND_URL}/api/usuarios/${usuarioId}/rol`); // Debug URL
       
       const response = await axios.put(
-        `http://localhost:8080/api/usuarios/${usuarioId}/rol`,
+        `${import.meta.env.VITE_BACKEND_URL}/api/usuarios/${usuarioId}/rol`,
         { rol: nuevoRol },
         { 
           withCredentials: true,
@@ -77,7 +77,7 @@ function EditUser() {
       
       // Si es un error de red (servidor no responde)
       if (error.message === 'Network Error') {
-        mensajeError = 'No se puede conectar al servidor. Verifica que el backend esté corriendo en http://localhost:8080';
+        mensajeError = 'No se puede conectar al servidor. Verifica que el backend esté corriendo en ${import.meta.env.VITE_BACKEND_URL}';
       }
       // Si el servidor responde con error
       else if (error.response?.data) {
@@ -113,7 +113,7 @@ function EditUser() {
 
     try {
       const response = await axios.delete(
-        `http://localhost:8080/api/usuarios/${usuarioId}`,
+        `${import.meta.env.VITE_BACKEND_URL}/api/usuarios/${usuarioId}`,
         { withCredentials: true }
       );
 
