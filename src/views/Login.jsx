@@ -21,7 +21,7 @@ function Login() {
       
       // 🔥 GUARDAR EL ID DEL USUARIO EN LOCALSTORAGE 🔥
       localStorage.setItem('usuarioId', user.usuarioId)
-
+      localStorage.setItem('userRole', res.data.rol);
       if (user && user.contrasena) user.contrasena = null
       storage.set('user', user)
       storage.set('auth', true)
