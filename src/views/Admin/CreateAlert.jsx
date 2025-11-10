@@ -200,7 +200,7 @@ function CreateAlert() {
               >
                 <option value="">{loadingRegiones ? 'Cargando regiones...' : 'Seleccione una región'}</option>
                 {regiones.map((region) => (
-                  <option key={region.regionId} value={region.regionId}>
+                  <option key={region.regionId} value={region.regionId || region.region_id}>
                     {region.nombre}
                   </option>
                 ))}
