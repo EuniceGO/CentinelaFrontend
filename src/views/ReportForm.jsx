@@ -14,7 +14,6 @@ L.Icon.Default.mergeOptions({
 export default function ReportForm() {
   const [tipo, setTipo] = useState('')
   const [descripcion, setDescripcion] = useState('')
-  const [estado, setEstado] = useState('Activo')
   const [position, setPosition] = useState(null)
   const [fotoUrl, setFotoUrl] = useState('')
   const mapRef = useRef(null)
@@ -84,9 +83,11 @@ export default function ReportForm() {
     // 🔹 Obtener el usuario guardado en sesión
     let usuarioSesion = null
     try {
+      // Intenta usar la importación dinámica, si falla, usa localStorage
       const storageMod = await import('../Storage/storage')
       usuarioSesion = storageMod.default.get('user') || storageMod.default.get('usuario')
     } catch (err) {
+      // Fallback para entornos donde la importación dinámica falla o si se usa almacenamiento nativo
       usuarioSesion = JSON.parse(localStorage.getItem('user') || localStorage.getItem('usuario') || 'null')
     }
 
@@ -105,9 +106,10 @@ export default function ReportForm() {
     const payload = {
       tipo,
       descripcion,
-      estado,
       latitud: Number(position[0]),
       longitud: Number(position[1]),
+      // 📌 CORRECCIÓN: Agregar el campo 'fecha' con la hora de creación actual.
+      fecha: new Date().toISOString(), 
       usuario: {
         usuarioId: usuarioId
       },
@@ -115,6 +117,7 @@ export default function ReportForm() {
     }
 
     try {
+      // Se asume que el backend usa la ruta /api/reportes
       const response = await axios.post(`${import.meta.env.VITE_BACKEND_URL}/api/reportes`, payload)
       console.log('Respuesta del servidor:', response.data)
       alert('Reporte enviado exitosamente ✅')
@@ -122,7 +125,6 @@ export default function ReportForm() {
       // 🔹 Limpiar el formulario
       setTipo('')
       setDescripcion('')
-      setEstado('Activo')
       setFotoUrl('')
     } catch (err) {
       console.error('Error al enviar:', err)
@@ -162,18 +164,7 @@ export default function ReportForm() {
               />
             </div>
 
-            <div className="mb-3">
-              <label className="form-label">Estado</label>
-              <select
-                className="form-select"
-                value={estado}
-                onChange={(e) => setEstado(e.target.value)}
-              >
-                <option>Activo</option>
-                <option>Atendido</option>
-                <option>Verificado</option>
-              </select>
-            </div>
+           
 
             {/* ✅ Campo para ingresar URL de la imagen */}
             <div className="mb-3">

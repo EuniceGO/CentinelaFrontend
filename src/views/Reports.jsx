@@ -303,77 +303,7 @@ export default function Reports() {
             </div>
         )}
 
-        {/* Estadísticas - Mejora visual con sombreado y bordes más finos */}
-        {isAdmin && !loading && (
-            <div className="row mb-5 g-4">
-                <div className="col-lg-3 col-md-6">
-                    <div className="card shadow-lg border-primary border-3 h-100 p-2">
-                        <div className="card-body">
-                            <div className="d-flex justify-content-between align-items-center">
-                                <div>
-                                    <p className="text-muted mb-1 small text-uppercase fw-bold">Total de Reportes</p>
-                                    <h2 className="mb-0 fw-bolder text-primary">{reports.length}</h2>
-                                </div>
-                                <div className="bg-primary bg-opacity-10 rounded-circle p-3">
-                                    <i className="bi bi-clipboard-data fs-2 text-primary"></i>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div className="col-lg-3 col-md-6">
-                    <div className="card shadow-lg border-warning border-3 h-100 p-2">
-                        <div className="card-body">
-                            <div className="d-flex justify-content-between align-items-center">
-                                <div>
-                                    <p className="text-muted mb-1 small text-uppercase fw-bold">Pendientes</p>
-                                    <h2 className="mb-0 fw-bolder text-warning">
-                                    {reports.filter(r => r.estado === 'PENDIENTE' || r.estado === 'Activo').length}
-                                    </h2>
-                                </div>
-                                <div className="bg-warning bg-opacity-10 rounded-circle p-3">
-                                    <i className="bi bi-clock-history fs-2 text-warning"></i>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div className="col-lg-3 col-md-6">
-                    <div className="card shadow-lg border-info border-3 h-100 p-2">
-                        <div className="card-body">
-                            <div className="d-flex justify-content-between align-items-center">
-                                <div>
-                                    <p className="text-muted mb-1 small text-uppercase fw-bold">En Proceso</p>
-                                    <h2 className="mb-0 fw-bolder text-info">
-                                    {reports.filter(r => r.estado === 'EN_PROCESO' || r.estado === 'Atendido').length}
-                                    </h2>
-                                </div>
-                                <div className="bg-info bg-opacity-10 rounded-circle p-3">
-                                    <i className="bi bi-gear-fill fs-2 text-info"></i>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div className="col-lg-3 col-md-6">
-                    <div className="card shadow-lg border-success border-3 h-100 p-2">
-                        <div className="card-body">
-                            <div className="d-flex justify-content-between align-items-center">
-                                <div>
-                                    <p className="text-muted mb-1 small text-uppercase fw-bold">Resueltos</p>
-                                    <h2 className="mb-0 fw-bolder text-success">
-                                    {reports.filter(r => r.estado === 'RESUELTO' || r.estado === 'Verificado').length}
-                                    </h2>
-                                </div>
-                                <div className="bg-success bg-opacity-10 rounded-circle p-3">
-                                    <i className="bi bi-check-circle-fill fs-2 text-success"></i>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        )}
+      
 
         {/* Filtros y Búsqueda - Diseño más compacto y claro */}
         <div className="card mb-5 shadow-lg border-0">
@@ -421,20 +351,6 @@ export default function Reports() {
                         </select>
                     </div>
                     <div className="col-lg-4 col-md-6">
-                        <label className="form-label fw-semibold mb-2 text-muted small">
-                            <i className="bi bi-flag me-1"></i>
-                            Filtrar por Estado
-                        </label>
-                        <select 
-                            className="form-select form-select-lg shadow-sm" 
-                            value={filterState} 
-                            onChange={(e) => setFilterState(e.target.value)}
-                        >
-                            <option value="">Todos los Estados</option>
-                            {uniqueStates.map(estado => (
-                                <option key={estado} value={estado}>{estado}</option>
-                            ))}
-                        </select>
                     </div>
                 </div>
             </div>
@@ -489,7 +405,6 @@ export default function Reports() {
                     <th className="fw-semibold ps-3" style={{ width: '80px' }}>ID</th>
                     <th className="fw-semibold">Tipo</th>
                     <th className="fw-semibold" style={{ minWidth: '250px' }}>Descripción</th>
-                    <th className="fw-semibold">Estado</th>
                     <th className="fw-semibold">Reportado por</th>
                     <th className="fw-semibold">Ubicación</th>
                     <th className="fw-semibold text-center">Evidencia</th>
@@ -512,11 +427,7 @@ export default function Reports() {
                         <td style={{ maxWidth: 300 }}>
                           <p className="mb-0 text-truncate">{r.descripcion}</p>
                         </td>
-                        <td>
-                          <span className={`badge bg-${getStateBadgeColor(r.estado)} px-3 py-2`}>
-                            {r.estado}
-                          </span>
-                        </td>
+                      
                         <td>
                           <div className="d-flex align-items-center">
                             <i className="bi bi-person-circle fs-5 text-primary me-2"></i>
