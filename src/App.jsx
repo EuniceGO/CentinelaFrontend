@@ -1,75 +1,81 @@
-import React from 'react'
-import { BrowserRouter, Route, Routes, Link } from 'react-router-dom'
-import './App.css'
-import Nav from './Components/Nav'
-import Login from './views/Login'
-import Register from './views/Register'
-import Alert from './views/User/Alert'
-import ReportForm from './views/ReportForm'
-import Reports from './views/Reports'
-import ReportDetail from './views/ReportDetail'
-import Logout from './views/Logout'
-import Inicio from './views/Home'
-import Dashboard from './views/Dashboard'
-import ProtectedRoutes from './Components/ProtectedRoutes'
-import Region from './views/Admin/Region'
-import EditUser from './views/Admin/EditUser'
-import EmergenciaForm from './views/EmergenciaForm'
-import Emergencias from './views/Emergencias'
-import EmergenciaDetail from './views/EmergenciaDetail'
-import CreateAlert from './views/Admin/CreateAlert'
-import ViewAlert from './views/ViewAlert'
-import EditAlert from './views/Admin/EditAlert'
+import React from 'react';
+// Importa 'Outlet' para el layout
+import { BrowserRouter, Route, Routes, Link, Outlet } from 'react-router-dom';
+import './App.css';
 
+// --- NA-TARIMA: Panag-adjust kadagiti import path ---
+// (Panag-tarima ti 'components' -> 'Components' ken panag-nayon ti .jsx)
+import Nav from './Components/Nav.jsx';
+import ProtectedRoutes from './Components/ProtectedRoutes.jsx';
 
+import Login from './views/Login.jsx';
+import Register from './views/Register.jsx';
+import Alert from './views/User/Alert.jsx';
+import ReportForm from './views/ReportForm.jsx';
+import Reports from './views/Reports.jsx';
+import ReportDetail from './views/ReportDetail.jsx';
+import Logout from './views/Logout.jsx';
+import Inicio from './views/Home.jsx';
+import Dashboard from './views/Dashboard.jsx';
+import Region from './views/Admin/Region.jsx';
+import EditUser from './views/Admin/EditUser.jsx';
+import EmergenciaForm from './views/EmergenciaForm.jsx';
+import Emergencias from './views/Emergencias.jsx';
+import EmergenciaDetail from './views/EmergenciaDetail.jsx';
+import CreateAlert from './views/Admin/CreateAlert.jsx';
+import ViewAlert from './views/ViewAlert.jsx';
+import EditAlert from './views/Admin/EditAlert.jsx';
 
+const AppLayout = () => {
+  return (
+    <>
+      <Nav />
+     
+      <main>
+        <Outlet />
+      </main>
+    </>
+  );
+};
 
 function App() {
-
   return (
     <>
       <BrowserRouter>
-       
-        
-       
+
         <Routes>
-          {/* Public routes */}
+
           <Route path="/" element={<Login />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           <Route path="/logout" element={<Logout />} />
 
-          
-        </Routes>
-          <Nav />
-        <Routes>
-          {/* Protected routes */}
-          <Route element={<ProtectedRoutes />}>
-            <Route path="/home" element={<Inicio />} />
-            <Route path="/dashboard" element={<Dashboard />} />
-          
-            <Route path='/report' element={<ReportForm />} />
-            <Route path='/emergencia' element={<EmergenciaForm />} />
-            <Route path='/emergencias' element={<Emergencias />} />
-            <Route path='/emergencia/:id' element={<EmergenciaDetail />} />
-
-            <Route path="/alert" element={<Alert />} />
-            <Route path="/reports" element={<Reports />} />
-            <Route path="/report/:id" element={<ReportDetail />} />
-            
-            <Route path='/view-alert' element={<ViewAlert />} />
-            {/* Rutas de administración */}
-            <Route path='/admin/edit-user' element={<EditUser />} />
-            <Route path='/admin/region' element={<Region />} />
-            <Route path='/admin/create-alert' element={<CreateAlert />} />
-            <Route path='/admin/alertas/editar/:id' element={<EditAlert />} />
-
-            
+ 
+          <Route element={<AppLayout />}>
+            <Route element={<ProtectedRoutes />}>
+              <Route path="/home" element={<Inicio />} />
+              <Route path="/dashboard" element={<Dashboard />} />
+              <Route path="/report" element={<ReportForm />} />
+              <Route path="/emergencia" element={<EmergenciaForm />} />
+              <Route path="/emergencias" element={<Emergencias />} />
+              <Route path="/emergencia/:id" element={<EmergenciaDetail />} />
+              <Route path="/alert" element={<Alert />} />
+              <Route path="/reports" element={<Reports />} />
+              <Route path="/report/:id" element={<ReportDetail />} />
+              <Route path="/view-alert" element={<ViewAlert />} />
+              
+              {/* Rutas de administración */}
+              <Route path="/admin/edit-user" element={<EditUser />} />
+              <Route path="/admin/region" element={<Region />} />
+              <Route path="/admin/create-alert" element={<CreateAlert />} />
+              <Route path="/admin/alertas/editar/:id" element={<EditAlert />} />
+            </Route>
           </Route>
+
         </Routes>
       </BrowserRouter>
     </>
-  )
+  );
 }
 
-export default App
+export default App;

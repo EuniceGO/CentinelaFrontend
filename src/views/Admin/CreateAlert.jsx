@@ -106,7 +106,7 @@ function CreateAlert() {
       });
       
       setTimeout(() => {
-        navigate('/admin/view-alert'); 
+        navigate('/view-alert'); 
       }, 1500);
       
     } catch (error) {
