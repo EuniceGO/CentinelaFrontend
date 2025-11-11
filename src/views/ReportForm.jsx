@@ -113,7 +113,7 @@ export default function ReportForm() {
       usuario: {
         usuarioId: usuarioId
       },
-      fotoUrl: fotoUrl || null // 👈 campo de URL opcional
+      fotoUrl: fotoUrl || null 
     }
 
     try {

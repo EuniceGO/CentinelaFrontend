@@ -233,7 +233,7 @@ export default function Emergencias() {
                                     </tr>
                                 ) : (
                                     paginatedEmergencias.map((em) => (
-                                        <tr key={em.emergenciaId || em.id}>
+                                        <tr key={em.emergenciaId || em.id || em.emergencia_id}>
                                             <td className='text-center text-muted fw-bold'>{em.emergenciaId || em.id}</td>
                                             <td className='text-truncate' style={{ maxWidth: '400px' }} title={em.mensaje}>
                                                 {em.mensaje}
@@ -247,7 +247,7 @@ export default function Emergencias() {
                                             <td className='text-center'>
                                                 {isAdmin ? (
                                                     <button
-                                                        className={`btn btn-sm w-100 fw-semibold ${em.atendido ? 'btn-success' : 'btn-danger'} shadow-sm rounded-pill py-2`}
+                                                        className={`btn btn-sm w-100 fw-semibold ${em.atendido ? 'btn-success' : 'btn-danger'} shadow-sm`}
                                                         onClick={() => handleToggleAtendido(em.emergenciaId || em.id, em.atendido)}
                                                         disabled={isActionLoading}
                                                         title={em.atendido ? 'Marcar como Pendiente' : 'Marcar como Atendida'}
@@ -268,7 +268,7 @@ export default function Emergencias() {
                                             {/* Columna de Acciones */}
                                             <td className='text-center'>
                                                 <Link 
-                                                    to={`/emergencia/${em.emergenciaId || em.id}`} 
+                                                    to={`/emergencia/${em.emergenciaId || em.id || em.emergencia_id}`} 
                                                     state={{ emergencia: em }} 
                                                     className="btn btn-sm btn-info text-white shadow-sm me-2"
                                                     title="Ver Detalles de la Emergencia"
