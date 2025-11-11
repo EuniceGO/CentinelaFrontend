@@ -44,9 +44,16 @@ export default function ReportDetail() {
 
   // Función auxiliar para obtener el ID del usuario
   const getUserId = () => {
-    const u = storage.get('user') || storage.get('usuario') || null;
-    if (!u) return null;
-    return u.id || u.usuarioId || u.usuario_id || u.user_id || u._id || u.id_usuario || null;
+    // Intenta usar 'storage', si falla o no está, busca en el almacenamiento nativo
+    try {
+      const u = storage.get('user') || storage.get('usuario') || null;
+      if (u) return u.id || u.usuarioId || u.usuario_id || u.user_id || u._id || u.id_usuario || null;
+    } catch (e) {
+      // Fallback a almacenamiento nativo si el módulo 'storage' da problemas
+      const u = JSON.parse(localStorage.getItem('user') || sessionStorage.getItem('user') || 'null');
+      if (u) return u.id || u.usuarioId || u.usuario_id || u.user_id || u._id || u.id_usuario || null;
+    }
+    return null;
   };
 
   // 2. Cargar el reporte si no está en location state
@@ -55,7 +62,8 @@ export default function ReportDetail() {
       if (report) return;
       try {
         setLoading(true);
-        const res = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/reportes/${id}`);
+        // Se asume que el endpoint es /api/reportes/:id
+        const res = await axios.get(`${API_BASE_URL}/reportes/${id}`);
         setReport(res.data);
       } catch (err) {
         console.error('Error fetching report:', err);
@@ -115,10 +123,12 @@ export default function ReportDetail() {
     let objectUrl = null;
     const loadPhoto = async () => {
       if (!report) return;
+      // Primero, intenta usar una URL directa si existe
       if (report.fotoUrl) {
         if (mounted) setPhotoSrc(report.fotoUrl);
         return;
       }
+      // Luego, intenta cargar el blob si existe un fotoId
       if (report.fotoId) {
         try {
           const url = `${API_BASE_URL}/fotos/${report.fotoId}`;
@@ -163,7 +173,9 @@ export default function ReportDetail() {
       const payload = {
         mensaje: comment,
         usuario: { usuarioId: usuarioId },
-        reporte: { reporteId: parseInt(id) }
+        reporte: { reporteId: parseInt(id) },
+        // Añadir la fecha de creación del comentario
+        fecha: new Date().toISOString() 
       };
       await axios.post(`${API_BASE_URL}/comentarios`, payload);
       setComment('');
@@ -209,6 +221,7 @@ export default function ReportDetail() {
         mensaje: editingComment.mensaje,
         usuario: { usuarioId: currentUserId || getUserId() },
         reporte: { reporteId: parseInt(id) }
+        // No se actualiza la fecha de creación, pero se puede añadir un campo 'fechaActualizacion' si el backend lo soporta
       };
 
       await axios.put(`${API_BASE_URL}/comentarios/${editingComment.id}`, payload);
@@ -241,9 +254,23 @@ export default function ReportDetail() {
   };
   
   /**
+   * ✅ CORRECCIÓN: Función para obtener la fecha del reporte.
+   * Busca la fecha en campos comunes (fecha, createdAt, creadoEn).
+   */
+  const getReportDate = (rep) => {
+    // Intenta usar campos comunes
+    const dateString = rep.fecha || rep.createdAt || rep.creadoEn || null;
+    if (dateString) {
+      const date = new Date(dateString);
+      if (!isNaN(date)) return date;
+    }
+    // Si no se encuentra o es inválido, retorna la fecha actual como último recurso (idealmente no debería pasar)
+    return new Date();
+  };
+
+  /**
    * 📌 MEJORA: Asegura usar la propiedad 'fecha' del comentario.
    * Formatea la fecha para los comentarios.
-   * Usa c.fecha, c.createdAt, o Date.now() como fallback.
    */
   const formatCommentDate = (comment) => {
     const dateString = comment.fecha || comment.createdAt || Date.now();
@@ -288,7 +315,9 @@ export default function ReportDetail() {
     );
   }
 
-  // --- CUERPO DEL COMPONENTE (Solo se ajusta la sección de Comentarios) ---
+  const reportDate = getReportDate(report);
+
+  // --- CUERPO DEL COMPONENTE ---
 
   return (
     <div className="container py-4" style={{ maxWidth: '1200px' }}>
@@ -313,9 +342,6 @@ export default function ReportDetail() {
                 <i className="bi bi-person-fill me-1"></i> Reportado por: **{report.usuario?.nombre || 'Usuario Anónimo'}**
               </p>
             </div>
-            <span className={`badge bg-${getStateBadgeColor(report.estado)} fs-4 px-4 py-3 shadow-sm`}>
-              {report.estado}
-            </span>
           </div>
         </div>
       </div>
@@ -341,7 +367,10 @@ export default function ReportDetail() {
                 <div className="col-md-6">
                   <div className="p-3 border rounded bg-light">
                     <small className="text-muted d-block text-uppercase fw-semibold">Fecha de Reporte</small>
-                    <h4 className="fw-bold mb-0">{new Date(report.fecha || Date.now()).toLocaleDateString('es-SV')}</h4>
+                    {/* ✅ CORRECCIÓN APLICADA AQUÍ */}
+                    <h4 className="fw-bold mb-0">
+                      {reportDate.toLocaleDateString('es-SV', { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
+                    </h4>
                   </div>
                 </div>
               </div>
@@ -485,13 +514,13 @@ export default function ReportDetail() {
                               {isAdmin && !isOwnComment && (
                                 <span className="badge bg-warning text-dark"><i className="bi bi-shield-fill-check me-1"></i>Admin</span>
                               )}
-                              {/* 📌 MEJORA: Mostrar fecha y hora correcta */}
+                              {/* 📌 Muestra fecha y hora correcta */}
                               <small className="text-muted d-block mt-1">
                                 <i className="bi bi-clock me-1"></i> Publicado el: **{formatCommentDate(c)}**
                               </small>
                             </div>
                             
-                            {/* 📌 MEJORA: Botones de acción más claros */}
+                            {/* Botones de acción más claros */}
                             {canModify && (
                               <div className="btn-group ms-2">
                                 <button 
