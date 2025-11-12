@@ -128,7 +128,6 @@ function ViewAlert() {
     setFiltroRegion('')
   }
 
-  // 🔹 NUEVO: calcular alertas visibles según la página actual
   const totalPaginas = Math.ceil(alertasFiltradas.length / alertasPorPagina)
   const indiceInicial = (paginaActual - 1) * alertasPorPagina
   const alertasVisibles = alertasFiltradas.slice(indiceInicial, indiceInicial + alertasPorPagina)

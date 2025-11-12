@@ -13,9 +13,7 @@ export default function Emergencias() {
     const leafletLoadedRef = useRef(false)
     const [mapReady, setMapReady] = useState(false)
 
-        // Helper: crear un icono SVG simple de color para los marcadores
         const createColoredIcon = (color = '#ff0000') => {
-                // pequeño círculo SVG como data URI
                 const svg = `data:image/svg+xml;utf8,${encodeURIComponent(`
                     <svg xmlns='http://www.w3.org/2000/svg' width='28' height='28' viewBox='0 0 28 28'>
                         <circle cx='14' cy='10' r='8' fill='${color}' stroke='white' stroke-width='2'/>
@@ -65,7 +63,6 @@ export default function Emergencias() {
         setUserRole(getUserRole());
     }, [fetchEmergencias]);
 
-    // Cargar Leaflet dinámicamente (CSS + JS)
     useEffect(() => {
         if (leafletLoadedRef.current) return
 
@@ -98,7 +95,6 @@ export default function Emergencias() {
         loadLeaflet()
     }, [])
 
-    // Inicializar mapa
     useEffect(() => {
         if (!leafletLoadedRef.current || mapRef.current) return
 
@@ -141,14 +137,12 @@ export default function Emergencias() {
         }
     }, [leafletLoadedRef.current])
 
-    // Actualizar marcadores cuando cambian las emergencias
     useEffect(() => {
         if (!mapReady || !mapRef.current) return
 
         const map = mapRef.current
         const layer = markersLayerRef.current
 
-        // Limpiar marcadores previos
         try { if (layer) layer.clearLayers() } catch (e) { console.warn(e) }
 
         const bounds = []
@@ -162,8 +156,7 @@ export default function Emergencias() {
             if (isNaN(latNum) || isNaN(lngNum)) return
 
                         try {
-                                // Color según estado
-                                const color = em.atendido ? '#16a34a' : '#ef4444' // verde : rojo
+                                const color = em.atendido ? '#16a34a' : '#ef4444' 
                                 const icon = createColoredIcon(color)
                                 const marker = window.L.marker([latNum, lngNum], { icon })
                                 const id = em.emergenciaId || em.id || em.emergencia_id || ''
@@ -192,7 +185,6 @@ export default function Emergencias() {
 
     }, [allEmergencias, mapReady])
 
-    // --- LÓGICA DE FILTRADO Y PAGINACIÓN ---
     const filteredEmergencias = useMemo(() => {
         let currentEmergencias = allEmergencias;
 
@@ -214,16 +206,14 @@ export default function Emergencias() {
             });
         }
         
-        // Resetear a la página 1 si los filtros o búsqueda cambian y la página actual ya no es válida
         if (currentPage > Math.ceil(currentEmergencias.length / ITEMS_PER_PAGE) && currentEmergencias.length > 0) {
              setCurrentPage(1);
         } else if (currentEmergencias.length === 0) {
-            setCurrentPage(1); // Asegurar que la página sea 1 si no hay resultados
+            setCurrentPage(1); 
         }
 
         return currentEmergencias;
-    }, [allEmergencias, searchTerm, filterStatus, currentPage]); // Se incluye currentPage aquí para que el reset sea reactivo
-
+    }, [allEmergencias, searchTerm, filterStatus, currentPage]); 
     const paginatedEmergencias = useMemo(() => {
         const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
         return filteredEmergencias.slice(startIndex, startIndex + ITEMS_PER_PAGE);
@@ -237,7 +227,6 @@ export default function Emergencias() {
         }
     };
 
-    // Lógica para cambiar el estado 'Atendido' (Solo Admin)
     const handleToggleAtendido = async (emergenciaId, currentAtendido) => {
         if (!isAdmin || isActionLoading) return;
 
@@ -265,7 +254,6 @@ export default function Emergencias() {
         }
     };
 
-    // Lógica para eliminar (Solo Admin)
     const handleDelete = async (emergenciaId) => {
         if (!isAdmin || isActionLoading) return;
 
@@ -292,7 +280,6 @@ export default function Emergencias() {
         }
     };
 
-    // --- RENDERIZADO ---
     return (
         <div className="container my-5">
             {/* Encabezado Principal */}
@@ -326,7 +313,7 @@ export default function Emergencias() {
                                 value={searchTerm}
                                 onChange={(e) => {
                                     setSearchTerm(e.target.value);
-                                    setCurrentPage(1); // Resetear a la página 1 al buscar
+                                    setCurrentPage(1); 
                                 }}
                             />
                         </div>
@@ -338,7 +325,7 @@ export default function Emergencias() {
                             value={filterStatus}
                             onChange={(e) => {
                                 setFilterStatus(e.target.value);
-                                setCurrentPage(1); // Resetear a la página 1 al filtrar
+                                setCurrentPage(1); 
                             }}
                          >
                             <option value="all">Todos los Estados</option>
@@ -472,8 +459,6 @@ export default function Emergencias() {
                             
                             {/* Lógica para renderizar solo un rango de páginas */}
                             {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => {
-                                // Mostrar hasta 5 páginas: la actual, 2 antes y 2 después.
-                                // También mostrar la primera y la última página si no están dentro del rango.
                                 if (page === 1 || page === totalPages || (page >= currentPage - 2 && page <= currentPage + 2)) {
                                     return (
                                         <li key={page} className={`page-item ${currentPage === page ? 'active' : ''}`}>

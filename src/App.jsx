@@ -1,10 +1,8 @@
 import React from 'react';
-// Importa 'Outlet' para el layout
 import { BrowserRouter, Route, Routes, Link, Outlet } from 'react-router-dom';
 import './App.css';
 
-// --- NA-TARIMA: Panag-adjust kadagiti import path ---
-// (Panag-tarima ti 'components' -> 'Components' ken panag-nayon ti .jsx)
+
 import Nav from './Components/Nav.jsx';
 import ProtectedRoutes from './Components/ProtectedRoutes.jsx';
 
