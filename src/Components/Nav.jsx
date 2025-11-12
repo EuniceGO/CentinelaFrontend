@@ -92,15 +92,13 @@ function Navbar() {
                     {isEmergencytDropdownOpen && (
                       <div className="absolute left-0 mt-1 w-48 rounded-lg border bg-white shadow-lg divide-y divide-gray-100 z-50">
                         <Link to="/emergencia" onClick={() => setIsEmergencytDropdownOpen(false)} className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">Crear Emergencias </Link>
-                        <Link to="/emergencias" onClick={() => setIsEmergencytDropdownOpen(false)} className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">Ver Emergencias</Link>
+                        <Link to="/ver-emergencias" onClick={() => setIsEmergencytDropdownOpen(false)} className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">Ver Emergencias</Link>
                       </div>
                     )}
                   </div>
 
 
-                
-                
-                {/* Alertas con submenú para admin */}
+
                 {isAdmin ? (
                   <div className="relative">
                     <button
