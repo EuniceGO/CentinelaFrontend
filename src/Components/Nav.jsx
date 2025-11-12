@@ -145,6 +145,8 @@ function Navbar() {
                       </div>
                     )}
                   </div>
+                
+                <Link to="/estadisticas" className="text-gray-700 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium">Estadísticas</Link>
                
 
                 
@@ -226,6 +228,7 @@ function Navbar() {
                 <Link to="/emergencias" onClick={closeMobileMenu} className="text-gray-700 hover:text-indigo-600 block px-3 py-2 rounded-md text-base font-medium">Ver Emergencias</Link>
                 <Link to="/dashboard" onClick={closeMobileMenu} className="text-gray-700 hover:text-indigo-600 block px-3 py-2 rounded-md text-base font-medium">Dashboard</Link>
                 <Link to="/reports" onClick={closeMobileMenu} className="text-gray-700 hover:text-indigo-600 block px-3 py-2 rounded-md text-base font-medium">Ver Reportes</Link>
+                <Link to="/estadisticas" onClick={closeMobileMenu} className="text-gray-700 hover:text-indigo-600 block px-3 py-2 rounded-md text-base font-medium">Estadísticas</Link>
                 
                 {/* Enlaces exclusivos para administradores en mobile */}
                 {isAdmin && (

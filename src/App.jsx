@@ -22,6 +22,7 @@ import EditUser from './views/Admin/EditUser.jsx';
 import EmergenciaForm from './views/EmergenciaForm.jsx';
 import Emergencias from './views/Emergencias.jsx';
 import EmergenciaDetail from './views/EmergenciaDetail.jsx';
+import Estadisticas from './views/Estadisticas.jsx';
 import CreateAlert from './views/Admin/CreateAlert.jsx';
 import ViewAlert from './views/ViewAlert.jsx';
 import EditAlert from './views/Admin/EditAlert.jsx';
@@ -59,6 +60,7 @@ function App() {
               <Route path="/emergencia" element={<EmergenciaForm />} />
               <Route path="/emergencias" element={<Emergencias />} />
               <Route path="/emergencia/:id" element={<EmergenciaDetail />} />
+               <Route path="/estadisticas" element={<Estadisticas />} />
               <Route path="/alert" element={<Alert />} />
               <Route path="/reports" element={<Reports />} />
               <Route path="/report/:id" element={<ReportDetail />} />
