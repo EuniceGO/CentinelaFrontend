@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback, useMemo } from 'react';
+import React, { useEffect, useState, useCallback, useMemo, useRef } from 'react';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
 
@@ -8,6 +8,28 @@ const ITEMS_PER_PAGE = 10;
 
 export default function Emergencias() {
     const [allEmergencias, setAllEmergencias] = useState([]);
+    const mapRef = useRef(null)
+    const markersLayerRef = useRef(null)
+    const leafletLoadedRef = useRef(false)
+    const [mapReady, setMapReady] = useState(false)
+
+        // Helper: crear un icono SVG simple de color para los marcadores
+        const createColoredIcon = (color = '#ff0000') => {
+                // pequeño círculo SVG como data URI
+                const svg = `data:image/svg+xml;utf8,${encodeURIComponent(`
+                    <svg xmlns='http://www.w3.org/2000/svg' width='28' height='28' viewBox='0 0 28 28'>
+                        <circle cx='14' cy='10' r='8' fill='${color}' stroke='white' stroke-width='2'/>
+                        <path d='M14 18 C18 18 22 22 14 26 C6 22 10 18 14 18 Z' fill='${color}' stroke='white' stroke-width='1'/>
+                    </svg>
+                `)}`
+
+                return window.L.icon({
+                        iconUrl: svg,
+                        iconSize: [28, 28],
+                        iconAnchor: [14, 28],
+                        popupAnchor: [0, -28]
+                })
+        }
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
     const [isActionLoading, setIsActionLoading] = useState(false);
@@ -42,6 +64,133 @@ export default function Emergencias() {
         fetchEmergencias();
         setUserRole(getUserRole());
     }, [fetchEmergencias]);
+
+    // Cargar Leaflet dinámicamente (CSS + JS)
+    useEffect(() => {
+        if (leafletLoadedRef.current) return
+
+        const loadLeaflet = async () => {
+            try {
+                if (!document.querySelector('link[href*="leaflet.css"]')) {
+                    const link = document.createElement('link')
+                    link.rel = 'stylesheet'
+                    link.href = 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.css'
+                    document.head.appendChild(link)
+                }
+
+                if (!window.L) {
+                    await new Promise((resolve, reject) => {
+                        const script = document.createElement('script')
+                        script.src = 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js'
+                        script.onload = resolve
+                        script.onerror = reject
+                        document.head.appendChild(script)
+                    })
+                }
+
+                leafletLoadedRef.current = true
+                console.log('✅ Leaflet cargado en Emergencias')
+            } catch (e) {
+                console.error('Error cargando Leaflet en Emergencias:', e)
+            }
+        }
+
+        loadLeaflet()
+    }, [])
+
+    // Inicializar mapa
+    useEffect(() => {
+        if (!leafletLoadedRef.current || mapRef.current) return
+
+        const initMap = () => {
+            if (!window.L) {
+                setTimeout(initMap, 100)
+                return
+            }
+
+            try {
+                const map = window.L.map('emergencias-map', {
+                    center: [13.7, -89.2],
+                    zoom: 9,
+                    scrollWheelZoom: true
+                })
+
+                window.L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    attribution: '© OpenStreetMap contributors',
+                    maxZoom: 18
+                }).addTo(map)
+
+                mapRef.current = map
+                markersLayerRef.current = window.L.layerGroup().addTo(map)
+                setMapReady(true)
+                console.log('✅ Mapa de emergencias inicializado')
+            } catch (e) {
+                console.error('Error inicializando mapa de emergencias:', e)
+            }
+        }
+
+        initMap()
+
+        return () => {
+            if (mapRef.current) {
+                mapRef.current.remove()
+                mapRef.current = null
+                markersLayerRef.current = null
+                setMapReady(false)
+            }
+        }
+    }, [leafletLoadedRef.current])
+
+    // Actualizar marcadores cuando cambian las emergencias
+    useEffect(() => {
+        if (!mapReady || !mapRef.current) return
+
+        const map = mapRef.current
+        const layer = markersLayerRef.current
+
+        // Limpiar marcadores previos
+        try { if (layer) layer.clearLayers() } catch (e) { console.warn(e) }
+
+        const bounds = []
+
+        allEmergencias.forEach((em) => {
+            const lat = em.latitud ?? em.lat ?? em.latitude ?? em.y
+            const lng = em.longitud ?? em.lng ?? em.longitude ?? em.x
+            if (lat == null || lng == null) return
+            const latNum = Number(lat)
+            const lngNum = Number(lng)
+            if (isNaN(latNum) || isNaN(lngNum)) return
+
+                        try {
+                                // Color según estado
+                                const color = em.atendido ? '#16a34a' : '#ef4444' // verde : rojo
+                                const icon = createColoredIcon(color)
+                                const marker = window.L.marker([latNum, lngNum], { icon })
+                                const id = em.emergenciaId || em.id || em.emergencia_id || ''
+                                const popupHtml = `
+                                        <div style="max-width:260px;font-size:13px">
+                                            <strong>Emergencia #${id}</strong><br/>
+                                            <div style="margin:6px 0;color:#ddd">${(em.mensaje || '').slice(0, 240)}</div>
+                                            <div style="font-size:12px;color:#bbb"><strong>Reportante:</strong> ${em.usuario?.nombre || em.usuario?.usuarioId || 'Anónimo'}</div>
+                                            <div style="font-size:12px;color:#bbb"><strong>Estado:</strong> ${em.atendido ? 'ATENDIDA' : 'PENDIENTE'}</div>
+                                            <div style="margin-top:8px">
+                                                <a href="/emergencia/${id}" style="display:inline-block;padding:6px 8px;background:#0ea5e9;color:#002233;border-radius:4px;text-decoration:none;font-weight:600">Ver detalle</a>
+                                            </div>
+                                        </div>
+                                `
+                                marker.bindPopup(popupHtml)
+                                marker.addTo(layer)
+                                bounds.push([latNum, lngNum])
+                        } catch (e) {
+                                console.warn('No se pudo agregar marcador para emergencia', em, e)
+                        }
+        })
+
+        if (bounds.length > 0) {
+            try { map.fitBounds(bounds, { padding: [50, 50], maxZoom: 12 }) } catch (e) { console.warn(e) }
+        }
+
+    }, [allEmergencias, mapReady])
 
     // --- LÓGICA DE FILTRADO Y PAGINACIÓN ---
     const filteredEmergencias = useMemo(() => {
@@ -209,6 +358,13 @@ export default function Emergencias() {
             {/* Mensajes de Estado: Cargando o Error */}
             {loading && <div className="alert alert-info d-flex align-items-center justify-content-center shadow-sm" role="alert"><span className="spinner-border spinner-border-sm me-2" aria-hidden="true"></span> Cargando emergencias...</div>}
             {error && <div className="alert alert-danger d-flex align-items-center justify-content-center shadow-sm" role="alert"><i className="bi bi-x-circle-fill me-2"></i> {error}</div>}
+
+            {/* MAPA DE EMERGENCIAS */}
+            <div className="card mb-4 shadow-sm">
+                <div className="card-body p-0">
+                    <div id="emergencias-map" style={{ height: '360px', width: '100%' }} />
+                </div>
+            </div>
 
             {/* TABLA DE EMERGENCIAS */}
             <div className="card shadow-lg border-0 rounded-3">
