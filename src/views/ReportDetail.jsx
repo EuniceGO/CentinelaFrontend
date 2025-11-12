@@ -501,7 +501,7 @@ export default function ReportDetail() {
                           className="p-3 rounded border"
                           style={{ 
                             borderLeft: isOwnComment ? '4px solid var(--bs-success)' : '4px solid var(--bs-primary)',
-                            backgroundColor: '#f8f9fa' // bg-light
+                            backgroundColor: '#f8f9fa' 
                           }}
                         >
                           {/* Header del comentario */}

@@ -26,7 +26,6 @@ export default function EmergenciaDetail() {
 
     const clearFeedback = () => setFeedback({ message: '', type: '' });
 
-    // Función para obtener los detalles por ID
     const fetchOne = useCallback(async () => {
         setLoading(true);
         setError(null);
@@ -48,7 +47,6 @@ export default function EmergenciaDetail() {
         setUserRole(getUserRole());
     }, [fetchOne, id]); 
 
-    // Cargar Leaflet dinámicamente para el mapa en el detalle
     useEffect(() => {
         if (leafletLoadedRef.current) return
         const load = async () => {
@@ -77,7 +75,6 @@ export default function EmergenciaDetail() {
         load()
     }, [])
 
-    // Inicializar mapa cuando se tenga la emergencia y Leaflet esté listo
     useEffect(() => {
         if (!leafletLoadedRef.current) return
         if (!emergencia) return
@@ -102,7 +99,6 @@ export default function EmergenciaDetail() {
                 maxZoom: 18
             }).addTo(map)
 
-            // icono simple
             const svg = `data:image/svg+xml;utf8,${encodeURIComponent(`
                 <svg xmlns='http://www.w3.org/2000/svg' width='36' height='36' viewBox='0 0 36 36'>
                   <circle cx='18' cy='12' r='8' fill='#ef4444' stroke='white' stroke-width='2'/>
@@ -139,7 +135,6 @@ export default function EmergenciaDetail() {
         }
     }, [leafletLoadedRef.current, emergencia])
 
-    // Lógica para cambiar el estado 'Atendido' (Solo Admin)
     const handleToggleAtendido = async () => {
         if (!isAdmin || isUpdating || !emergencia) return;
         

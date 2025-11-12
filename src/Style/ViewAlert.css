@@ -1,13 +1,13 @@
 .container-alert {
   min-height: 100vh;
-  padding: 2rem 1rem; /* Esto puede sobreescribir el padding de Tailwind */
+  padding: 2rem 1rem; 
   box-sizing: border-box;
 }
 
 .alert-list {
   width: 100%;
   max-width: 900px;
-  margin: 0 auto; /* centrado horizontal */
+  margin: 0 auto; 
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
@@ -23,12 +23,12 @@
           min-height: 100vh;
           padding: 2rem 1rem;
           box-sizing: border-box;
-          background-color: #ffffff !important; /* Forzando fondo blanco */
+          background-color: #ffffff !important; 
         }
         .alert-list {
           width: 100%;
           max-width: 900px;
-          margin: 0 auto; /* centrado horizontal */
+          margin: 0 auto; 
           display: flex;
           flex-direction: column;
           gap: 1.5rem;

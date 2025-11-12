@@ -10,7 +10,6 @@ function formatDate(d) {
 }
 
 function Home() {
-  // Número de items a mostrar en Home por sección
   const HOME_LIMIT = 5;
 
   const [emergencias, setEmergencias] = useState([]);

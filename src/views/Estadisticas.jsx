@@ -2,7 +2,6 @@ import React, { useEffect, useRef, useState } from 'react'
 import axios from 'axios'
 import { jsPDF } from 'jspdf'
 
-// Función auxiliar para adaptar distintas estructuras de respuesta del backend
 function extractLabelCount(obj) {
   if (!obj) return { label: 'N/D', count: 0 }
   const labelKeys = ['tipo', 'estado', 'region', 'regionName', 'label', 'name', 'nombre', 'nivel', 'atendido']
@@ -11,7 +10,6 @@ function extractLabelCount(obj) {
   for (const k of labelKeys) {
     if (k in obj) {
       const raw = obj[k]
-      // handle boolean attended flags
       if (typeof raw === 'boolean') {
         const label = raw ? 'Atendido' : 'No atendido'
         const countKey = countKeys.find(c => c in obj && typeof obj[c] === 'number')
@@ -59,7 +57,6 @@ export default function Estadisticas() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
 
-  // Utilidades para descargar datos
   const downloadBlob = (content, filename, type = 'application/json') => {
     const blob = new Blob([content], { type })
     const url = URL.createObjectURL(blob)
@@ -81,7 +78,6 @@ export default function Estadisticas() {
     }
   }
 
-  // Generar PDF simple y legible a partir de un array de objetos o valores
   const downloadPDF = (name, data) => {
     try {
       const doc = new jsPDF({ unit: 'pt', format: 'letter' })
@@ -105,7 +101,6 @@ export default function Estadisticas() {
         return
       }
 
-      // Si es un array de objetos, escribir cada objeto como bloques
       if (Array.isArray(data)) {
         data.forEach((item, idx) => {
           if (y > 720) { doc.addPage(); y = margin }
@@ -119,14 +114,12 @@ export default function Estadisticas() {
             keys.forEach((k) => {
               if (y > 720) { doc.addPage(); y = margin }
               const val = item[k] === null || item[k] === undefined ? '' : String(item[k])
-              // Acortar líneas muy largas
               const maxLineWidth = 450
               const split = doc.splitTextToSize(`${k}: ${val}`, maxLineWidth)
               doc.text(split, margin, y)
               y += lineHeight * split.length
             })
           } else {
-            // Valor primitivo
             const text = String(item)
             const split = doc.splitTextToSize(text, 520)
             doc.text(split, margin, y)
@@ -136,7 +129,6 @@ export default function Estadisticas() {
           y += lineHeight / 2
         })
       } else if (typeof data === 'object') {
-        // Un solo objeto
         const keys = Object.keys(data)
         keys.forEach((k) => {
           if (y > 720) { doc.addPage(); y = margin }
@@ -159,7 +151,6 @@ export default function Estadisticas() {
 
   const toCSV = (arr) => {
     if (!Array.isArray(arr) || arr.length === 0) return ''
-    // Collect all keys
     const keys = Array.from(arr.reduce((s, o) => { Object.keys(o || {}).forEach(k => s.add(k)); return s }, new Set()))
     const esc = (v) => {
       if (v == null) return ''
@@ -189,12 +180,10 @@ export default function Estadisticas() {
   const [mapReady, setMapReady] = useState(false)
   
 
-  // Cargar Leaflet y plugins dinámicamente
   useEffect(() => {
     if (leafletLoadedRef.current) return
 
     const loadLeaflet = async () => {
-      // Cargar CSS de Leaflet
       if (!document.querySelector('link[href*="leaflet.css"]')) {
         const link = document.createElement('link')
         link.rel = 'stylesheet'
@@ -202,7 +191,6 @@ export default function Estadisticas() {
         document.head.appendChild(link)
       }
 
-      // Cargar Leaflet JS
       if (!window.L) {
         await new Promise((resolve, reject) => {
           const script = document.createElement('script')
@@ -213,7 +201,6 @@ export default function Estadisticas() {
         })
       }
 
-      // Cargar leaflet.heat plugin
       if (!window.L.heatLayer) {
         await new Promise((resolve, reject) => {
           const script = document.createElement('script')
@@ -269,7 +256,6 @@ export default function Estadisticas() {
     fetchAll()
   }, [])
 
-  // Inicializar mapa
   useEffect(() => {
     if (!leafletLoadedRef.current || mapRef.current) return
 
@@ -296,8 +282,7 @@ export default function Estadisticas() {
         markersLayerRef.current = window.L.layerGroup().addTo(map)
         
         console.log('✅ Mapa inicializado correctamente')
-        setMapReady(true) // ¡ESTO ES CLAVE!
-        // No se inicializa mapa de emergencias (deshabilitado por solicitud)
+        setMapReady(true) 
       } catch (e) {
         console.error('Error inicializando mapa:', e)
       }
@@ -315,7 +300,6 @@ export default function Estadisticas() {
     }
   }, [leafletLoadedRef.current])
 
-  // Pintar puntos del heatmap
   useEffect(() => {
     const map = mapRef.current
     if (!mapReady || !map || !window.L || !window.L.heatLayer) {
@@ -328,7 +312,6 @@ export default function Estadisticas() {
       return
     }
 
-    // Limpiar heat layer anterior
     if (heatLayerRef.current) {
       try { 
         map.removeLayer(heatLayerRef.current) 
@@ -345,7 +328,6 @@ export default function Estadisticas() {
 
     console.log('🔥 Creando heatmap con', heatPoints.length, 'puntos')
 
-    // Construir array [[lat,lng,intensity], ...]
     const pts = []
     let maxVal = 0
     
@@ -361,7 +343,6 @@ export default function Estadisticas() {
         return
       }
       
-      // Filtrar puntos fuera de El Salvador (aproximadamente 13-14.5 lat, -88 a -90.5 lng)
       const latNum = Number(lat)
       const lngNum = Number(lng)
       if (latNum < 12.5 || latNum > 15 || lngNum < -91 || lngNum > -87) {
@@ -380,7 +361,6 @@ export default function Estadisticas() {
 
     console.log('✅ Puntos procesados:', pts.length)
 
-    // Normalizar intensidad
     const normalized = pts.map(([lat, lng, v]) => [
       lat, 
       lng, 
@@ -388,13 +368,12 @@ export default function Estadisticas() {
     ])
 
     try {
-      // Crear capa heat con configuración más visible
       const heat = window.L.heatLayer(normalized, { 
-        radius: 40,      // Radio más grande
-        blur: 25,        // Blur más pronunciado
+        radius: 40,      
+        blur: 25,        
         maxZoom: 17,
         max: 1.0,
-        minOpacity: 0.4, // Opacidad mínima para que sea visible
+        minOpacity: 0.4,
         gradient: {
           0.0: 'blue',
           0.2: 'cyan',
@@ -410,7 +389,6 @@ export default function Estadisticas() {
       
       console.log('✅ Heatmap agregado al mapa')
 
-      // Ajustar bounds para que se vean todos los puntos
       const bounds = pts.map(p => [p[0], p[1]])
       if (bounds.length > 0) {
         map.fitBounds(bounds, { 
@@ -423,11 +401,8 @@ export default function Estadisticas() {
       console.error('❌ Error creando heatmap:', e)
       setError(new Error('Error al crear el mapa de calor'))
     }
-  }, [heatPoints, mapReady]) // ¡Dependencia de mapReady!
+  }, [heatPoints, mapReady]) 
 
-  // Mapa de emergencias deshabilitado por petición del usuario
-
-  // Renderiza barras horizontales
   const renderBars = (arr) => {
     if (!arr || arr.length === 0) return <div className="text-gray-400">Sin datos</div>
     const parsed = arr.map(extractLabelCount)
@@ -587,7 +562,6 @@ export default function Estadisticas() {
                       const lng = point.longitud ?? point.lng ?? point.longitude ?? point.x
                       const cantidad = point.count ?? point.cantidad ?? point.value ?? 0
                       
-                      // Verificar si está dentro de El Salvador
                       const enElSalvador = lat >= 12.5 && lat <= 15 && lng >= -91 && lng <= -87
                       
                       return (

@@ -8,17 +8,14 @@ function EditUser() {
   const [mensaje, setMensaje] = useState({ texto: '', tipo: '' });
   const [currentUserId, setCurrentUserId] = useState(null);
 
-  // Cargar usuarios al montar el componente
   useEffect(() => {
     cargarUsuarios();
-    // Obtener el ID del usuario actual del localStorage
     const userId = localStorage.getItem('usuarioId');
     if (userId) {
       setCurrentUserId(parseInt(userId));
     }
   }, []);
 
-  // Función para cargar todos los usuarios
   const cargarUsuarios = async () => {
     try {
       const response = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/usuarios`, {
@@ -34,19 +31,16 @@ function EditUser() {
     }
   };
 
-  // Función para cambiar el rol de un usuario
   const cambiarRol = async (usuarioId, nuevoRol) => {
-    // Verificar si es el usuario actual
     if (usuarioId === currentUserId) {
       mostrarMensaje('No puedes cambiar tu propio rol', 'error');
-      // Recargar usuarios para revertir el cambio en el select
       cargarUsuarios();
       return;
     }
 
     try {
-      console.log('Cambiando rol:', { usuarioId, nuevoRol }); // Debug
-      console.log('URL:', `${import.meta.env.VITE_BACKEND_URL}/api/usuarios/${usuarioId}/rol`); // Debug URL
+      console.log('Cambiando rol:', { usuarioId, nuevoRol }); 
+      console.log('URL:', `${import.meta.env.VITE_BACKEND_URL}/api/usuarios/${usuarioId}/rol`); 
       
       const response = await axios.put(
         `${import.meta.env.VITE_BACKEND_URL}/api/usuarios/${usuarioId}/rol`,
@@ -56,30 +50,27 @@ function EditUser() {
           headers: {
             'Content-Type': 'application/json'
           },
-          timeout: 10000 // 10 segundos de timeout
+          timeout: 10000 
         }
       );
 
-      console.log('Respuesta del servidor:', response.data); // Debug
+      console.log('Respuesta del servidor:', response.data); 
       
       if (response.status === 200) {
-        // El servidor devuelve un objeto con: { mensaje, usuarioId, nuevoRol }
         const mensaje = response.data?.mensaje || 'Rol actualizado correctamente';
         mostrarMensaje(mensaje, 'exito');
-        cargarUsuarios(); // Recargar la lista
+        cargarUsuarios(); 
       }
     } catch (error) {
-      console.error('Error completo:', error); // Debug completo
-      console.error('Error response:', error.response); // Debug response
-      console.error('Error message:', error.message); // Debug message
+      console.error('Error completo:', error); 
+      console.error('Error response:', error.response); 
+      console.error('Error message:', error.message); 
       
       let mensajeError = 'Error al actualizar rol';
       
-      // Si es un error de red (servidor no responde)
       if (error.message === 'Network Error') {
         mensajeError = 'No se puede conectar al servidor. Verifica que el backend esté corriendo en ${import.meta.env.VITE_BACKEND_URL}';
       }
-      // Si el servidor responde con error
       else if (error.response?.data) {
         if (typeof error.response.data === 'object' && error.response.data.mensaje) {
           mensajeError = error.response.data.mensaje;
@@ -88,20 +79,16 @@ function EditUser() {
           mensajeError = error.response.data;
         }
       } 
-      // Otros errores
       else if (error.message) {
         mensajeError = error.message;
       }
       
       mostrarMensaje(mensajeError, 'error');
-      // Recargar usuarios para revertir el cambio en el select
       cargarUsuarios();
     }
   };
 
-  // Función para eliminar usuario
   const eliminarUsuario = async (usuarioId) => {
-    // Verificar si es el usuario actual
     if (usuarioId === currentUserId) {
       mostrarMensaje('No puedes eliminar tu propia cuenta', 'error');
       return;
@@ -127,7 +114,6 @@ function EditUser() {
     }
   };
 
-  // Función para mostrar mensajes temporales
   const mostrarMensaje = (texto, tipo) => {
     setMensaje({ texto, tipo });
     setTimeout(() => {
@@ -135,13 +121,11 @@ function EditUser() {
     }, 3000);
   };
 
-  // Mapeo de región para mostrar formato legible
   const formatearRegion = (region) => {
     if (!region) return 'N/A';
     return region.replace(/_/g, ' ');
   };
 
-  // Obtener el valor del rol como string
   const obtenerRolString = (rol) => {
     if (typeof rol === 'string') {
       return rol.toLowerCase();

@@ -44,6 +44,7 @@ const getReportCoords = (report) => {
 const useLeafletMap = (reports, filterType, filterState, searchTerm) => {
   const mapRef = useRef(null);
   const markersLayerRef = useRef(null);
+  const markersRef = useRef({});
 
   useEffect(() => {
     if (mapRef.current) return;
@@ -67,6 +68,7 @@ const useLeafletMap = (reports, filterType, filterState, searchTerm) => {
     const layer = markersLayerRef.current;
     if (!layer || !reports) return;
     layer.clearLayers();
+    markersRef.current = {};
 
     const filteredReports = reports.filter(r => {
       const matchType = !filterType || r.tipo === filterType;
@@ -97,6 +99,12 @@ const useLeafletMap = (reports, filterType, filterState, searchTerm) => {
         marker.bindPopup(popup);
         layer.addLayer(marker);
         latlngs.push([lat, lng]);
+        
+        // Guardar referencia del marcador por ID de reporte
+        const reportId = getReportId(r);
+        if (reportId) {
+          markersRef.current[reportId] = marker;
+        }
       }
     });
 
@@ -107,6 +115,26 @@ const useLeafletMap = (reports, filterType, filterState, searchTerm) => {
       else map.setView([13.9946, -89.5597], 6);
     }
   }, [reports, filterType, filterState, searchTerm]);
+
+  // Función para centrar el mapa en un marcador específico
+  const focusOnMarker = useCallback((reportId) => {
+    const marker = markersRef.current[reportId];
+    const map = mapRef.current;
+    
+    if (marker && map) {
+      const latlng = marker.getLatLng();
+      map.setView(latlng, 15, { animate: true, duration: 1 });
+      marker.openPopup();
+      
+      // Scroll suave al mapa
+      document.getElementById('reports-map')?.scrollIntoView({ 
+        behavior: 'smooth', 
+        block: 'center' 
+      });
+    }
+  }, []);
+
+  return focusOnMarker;
 };
 
 
@@ -121,6 +149,8 @@ export default function Reports() {
   const [filterState, setFilterState] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
   const [userRole, setUserRole] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
 
   // Lógica de Rol
   useEffect(() => {
@@ -150,8 +180,8 @@ export default function Reports() {
   }, [fetchReports]);
 
 
-  // Lógica de Mapeo (Custom Hook)
-  useLeafletMap(reports, filterType, filterState, searchTerm);
+  // Lógica de Mapeo (Custom Hook) - Ahora devuelve la función focusOnMarker
+  const focusOnMarker = useLeafletMap(reports, filterType, filterState, searchTerm);
 
 
   // Lógica de Manipulación de Datos
@@ -228,6 +258,7 @@ export default function Reports() {
     setFilterType('');
     setFilterState('');
     setSearchTerm('');
+    setCurrentPage(1);
   }, []);
 
 
@@ -249,6 +280,19 @@ export default function Reports() {
   const uniqueStates = useMemo(() => 
     [...new Set(reports.map(r => r.estado).filter(Boolean))]
   , [reports]);
+
+  // Lógica de Paginación
+  const totalPages = Math.ceil(filteredReports.length / itemsPerPage);
+  const paginatedReports = useMemo(() => {
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    return filteredReports.slice(startIndex, startIndex + itemsPerPage);
+  }, [filteredReports, currentPage, itemsPerPage]);
+
+  useEffect(() => {
+    if (currentPage > totalPages && totalPages > 0) {
+      setCurrentPage(1);
+    }
+  }, [currentPage, totalPages]);
 
   // 6. Renderizado de la UI
   return (
@@ -371,21 +415,40 @@ export default function Reports() {
             </div>
             <div className="card-footer bg-light text-muted small py-3">
                 <i className="bi bi-hand-index-thumb me-1"></i>
-                El mapa se actualiza automáticamente según los filtros aplicados arriba.
+                El mapa se actualiza automáticamente según los filtros aplicados arriba. Haz clic en la ubicación de cualquier reporte para verlo en el mapa.
             </div>
         </div>
 
          {/* Tabla de Reportes */}
       <div className="card shadow-sm border-0">
         <div className="card-header bg-white border-bottom py-3">
-          <div className="d-flex justify-content-between align-items-center">
+          <div className="d-flex justify-content-between align-items-center flex-wrap gap-3">
             <h5 className="mb-0 fw-bold">
               <i className="bi bi-table text-primary me-2"></i>
               Listado de Reportes
             </h5>
-            <span className="badge bg-primary rounded-pill px-3 py-2">
-              {filteredReports.length} {filteredReports.length === 1 ? 'Reporte' : 'Reportes'}
-            </span>
+            <div className="d-flex align-items-center gap-3">
+              <span className="badge bg-primary rounded-pill px-3 py-2">
+                {filteredReports.length} {filteredReports.length === 1 ? 'Reporte' : 'Reportes'}
+              </span>
+              <div className="d-flex align-items-center gap-2">
+                <label className="text-muted small mb-0">Mostrar:</label>
+                <select 
+                  className="form-select form-select-sm" 
+                  style={{ width: '80px' }}
+                  value={itemsPerPage}
+                  onChange={(e) => {
+                    setItemsPerPage(Number(e.target.value));
+                    setCurrentPage(1);
+                  }}
+                >
+                  <option value="5">5</option>
+                  <option value="10">10</option>
+                  <option value="25">25</option>
+                  <option value="50">50</option>
+                </select>
+              </div>
+            </div>
           </div>
         </div>
         <div className="card-body p-0">
@@ -412,8 +475,11 @@ export default function Reports() {
                   </tr>
                 </thead>
                 <tbody>
-                  {filteredReports.map((r) => {
-                    const id = r.reporteId ?? r.reporte_id ?? r.id
+                  {paginatedReports.map((r) => {
+                    const id = getReportId(r);
+                    const { lat, lng } = getReportCoords(r);
+                    const hasLocation = lat !== null && lng !== null;
+                    
                     return (
                       <tr key={id ?? Math.random()}>
                         <td className="ps-3">
@@ -435,14 +501,29 @@ export default function Reports() {
                           </div>
                         </td>
                         <td>
-                          <small className="text-muted d-block">
-                            <i className="bi bi-geo-alt-fill me-1"></i>
-                            Lat: {(r.latitud ?? r.lat)?.toFixed?.(4) ?? '-'}
-                          </small>
-                          <small className="text-muted d-block">
-                            <i className="bi bi-geo-alt me-1"></i>
-                            Lng: {(r.longitud ?? r.lng)?.toFixed?.(4) ?? '-'}
-                          </small>
+                          {hasLocation ? (
+                            <button 
+                              className="btn btn-sm btn-outline-success d-flex flex-column align-items-start p-2"
+                              onClick={() => focusOnMarker(id)}
+                              title="Ver en el mapa"
+                              style={{ cursor: 'pointer', border: '1px solid #198754' }}
+                            >
+                              <small className="text-success d-flex align-items-center">
+                                <i className="bi bi-geo-alt-fill me-1"></i>
+                                Lat: {lat.toFixed(4)}
+                              </small>
+                              <small className="text-success d-flex align-items-center">
+                                <i className="bi bi-geo-alt me-1"></i>
+                                Lng: {lng.toFixed(4)}
+                              </small>
+                              <small className="text-muted fst-italic mt-1">
+                                <i className="bi bi-cursor-fill me-1"></i>
+                                Click para ver
+                              </small>
+                            </button>
+                          ) : (
+                            <span className="text-muted small">Sin ubicación</span>
+                          )}
                         </td>
                         <td className="text-center">
                           {r.fotoUrl ? (
@@ -499,6 +580,85 @@ export default function Reports() {
             </div>
           )}
         </div>
+        
+        {/* Paginación */}
+        {filteredReports.length > 0 && totalPages > 1 && (
+          <div className="card-footer bg-light border-top py-3">
+            <div className="d-flex justify-content-between align-items-center flex-wrap gap-3">
+              <div className="text-muted small">
+                Mostrando <strong>{((currentPage - 1) * itemsPerPage) + 1}</strong> - <strong>{Math.min(currentPage * itemsPerPage, filteredReports.length)}</strong> de <strong>{filteredReports.length}</strong> reportes
+              </div>
+              <nav>
+                <ul className="pagination pagination-sm mb-0">
+                  <li className={`page-item ${currentPage === 1 ? 'disabled' : ''}`}>
+                    <button 
+                      className="page-link" 
+                      onClick={() => setCurrentPage(1)}
+                      disabled={currentPage === 1}
+                      title="Primera página"
+                    >
+                      <i className="bi bi-chevron-double-left"></i>
+                    </button>
+                  </li>
+                  <li className={`page-item ${currentPage === 1 ? 'disabled' : ''}`}>
+                    <button 
+                      className="page-link" 
+                      onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+                      disabled={currentPage === 1}
+                      title="Página anterior"
+                    >
+                      <i className="bi bi-chevron-left"></i>
+                    </button>
+                  </li>
+                  
+                  {[...Array(totalPages)].map((_, i) => {
+                    const pageNum = i + 1;
+                    if (
+                      pageNum === 1 || 
+                      pageNum === totalPages || 
+                      (pageNum >= currentPage - 1 && pageNum <= currentPage + 1)
+                    ) {
+                      return (
+                        <li key={pageNum} className={`page-item ${currentPage === pageNum ? 'active' : ''}`}>
+                          <button 
+                            className="page-link" 
+                            onClick={() => setCurrentPage(pageNum)}
+                          >
+                            {pageNum}
+                          </button>
+                        </li>
+                      );
+                    } else if (pageNum === currentPage - 2 || pageNum === currentPage + 2) {
+                      return <li key={pageNum} className="page-item disabled"><span className="page-link">...</span></li>;
+                    }
+                    return null;
+                  })}
+                  
+                  <li className={`page-item ${currentPage === totalPages ? 'disabled' : ''}`}>
+                    <button 
+                      className="page-link" 
+                      onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+                      disabled={currentPage === totalPages}
+                      title="Página siguiente"
+                    >
+                      <i className="bi bi-chevron-right"></i>
+                    </button>
+                  </li>
+                  <li className={`page-item ${currentPage === totalPages ? 'disabled' : ''}`}>
+                    <button 
+                      className="page-link" 
+                      onClick={() => setCurrentPage(totalPages)}
+                      disabled={currentPage === totalPages}
+                      title="Última página"
+                    >
+                      <i className="bi bi-chevron-double-right"></i>
+                    </button>
+                  </li>
+                </ul>
+              </nav>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Modal de Edición - Solo para admin */}
