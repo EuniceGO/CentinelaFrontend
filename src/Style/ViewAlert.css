@@ -1,6 +1,6 @@
 .container-alert {
   min-height: 100vh;
-  padding: 2rem 1rem;
+  padding: 2rem 1rem; /* Esto puede sobreescribir el padding de Tailwind */
   box-sizing: border-box;
 }
 
@@ -10,12 +10,31 @@
   margin: 0 auto; /* centrado horizontal */
   display: flex;
   flex-direction: column;
-  gap: 1.5rem; 
+  gap: 1.5rem;
 }
 
 .container-alert article {
   width: 100%;
   max-width: 100%;
-  margin: 0 auto; 
+  margin: 0 auto;
 }
 
+   .container-alert {
+          min-height: 100vh;
+          padding: 2rem 1rem;
+          box-sizing: border-box;
+          background-color: #ffffff !important; /* Forzando fondo blanco */
+        }
+        .alert-list {
+          width: 100%;
+          max-width: 900px;
+          margin: 0 auto; /* centrado horizontal */
+          display: flex;
+          flex-direction: column;
+          gap: 1.5rem;
+        }
+        .container-alert article {
+          width: 100%;
+          max-width: 100%;
+          margin: 0 auto;
+        }

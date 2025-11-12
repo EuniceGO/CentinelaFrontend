@@ -20,7 +20,6 @@ function EditAlert() {
     nivel: ''
   });
 
-  // Obtener usuario actual
   useEffect(() => {
     const user = storage.get('user');
     if (user) {
@@ -36,7 +35,7 @@ function EditAlert() {
     }
   }, [navigate]);
 
-  // Cargar datos de la alerta
+  
   useEffect(() => {
     const cargarAlerta = async () => {
       try {
@@ -49,12 +48,12 @@ function EditAlert() {
           titulo: alerta.titulo || '',
           descripcion: alerta.descripcion || '',
           nivel: alerta.nivel || '',
-          id_usuario: alerta.usuario?.usuarioId || '' // Aunque no se use en el form, es bueno tenerlo
+          id_usuario: alerta.usuario?.usuarioId || ''
         });
       } catch (error) {
         console.error('Error al cargar alerta:', error);
         showAlert('Error al cargar los datos de la alerta', 'error');
-        navigate('/admin/view-alert'); // Asegúrate que esta ruta sea correcta
+        navigate('/admin/view-alert'); 
       } finally {
         setLoadingData(false);
       }
@@ -65,7 +64,7 @@ function EditAlert() {
     }
   }, [id, navigate]);
 
-  // Cargar regiones
+ 
   useEffect(() => {
     const cargarRegiones = async () => {
       try {
@@ -108,12 +107,9 @@ function EditAlert() {
          descripcion: formData.descripcion.trim(),
          nivel: formData.nivel,
          region: {
-           // Asegúrate que tu backend maneje 'null' o un objeto sin ID si no se selecciona región
            regionId: formData.region_id ? parseInt(formData.region_id) : null 
          },
          usuario: {
-           // El ID del usuario que está *editando* la alerta.
-           // Si el backend espera el ID del *creador*, deberías usar formData.id_usuario
            usuarioId: parseInt(userId) 
          }
       };
@@ -123,10 +119,10 @@ function EditAlert() {
         alertaData
       );
 
-      showAlert('Alerta actualizada exitosamente', 'success');
+      showAlert('success', 'Alerta actualizada exitosamente');
       
       setTimeout(() => {
-        navigate('/admin/alertas/ver'); // Asegúrate que esta ruta sea la correcta
+        navigate('/view-alert'); 
       }, 1500);
 
     } catch (error) {
@@ -147,33 +143,32 @@ function EditAlert() {
   if (loadingData) {
     return (
       
-      <div className="min-h-screen flex items-center justify-center bg-gray-900">
+      <div className="min-h-screen flex items-center justify-center bg-gray-100">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto"></div>
-          <p className="mt-4 text-gray-400">Cargando datos...</p>
+          <p className="mt-4 text-gray-600">Cargando datos...</p>
         </div>
       </div>
     );
   }
 
   return (
-    
-    <div className="min-h-screen bg-gray-900 py-8 px-4 sm:px-6 lg:px-8">
+
+    <div className="min-h-screen bg-gray-100 py-8 px-4 sm:px-6 lg:px-8">
       <div className="max-w-2xl mx-auto">
         
-       
-        <div className="bg-gray-800 rounded-md overflow-hidden border border-gray-700 hover:shadow-lg transition-shadow p-6">
+
+        <div className="bg-white rounded-lg overflow-hidden border border-gray-200 shadow-md p-6">
           <div className="mb-6">
-            <h2 className="text-2xl font-bold text-white">Editar Alerta</h2>
-            <p className="mt-1 text-sm text-gray-400">
+            <h2 className="text-2xl font-bold text-gray-900">Editar Alerta</h2>
+            <p className="mt-1 text-sm text-gray-600">
               Modifica los datos de la alerta
             </p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-6">
-            {/* Título */}
             <div>
-              <label htmlFor="titulo" className="block text-sm font-medium text-gray-300 mb-2">
+              <label htmlFor="titulo" className="block text-sm font-medium text-gray-700 mb-2">
                 Título <span className="text-red-500">*</span>
               </label>
               <input
@@ -182,16 +177,14 @@ function EditAlert() {
                 name="titulo"
                 value={formData.titulo}
                 onChange={handleChange}
-                
-                className="w-full px-4 py-2 bg-gray-700 border border-gray-600 text-white rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition"
+                className="w-full px-4 py-2 bg-white border border-gray-300 text-gray-900 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
                 placeholder="Ingrese el título de la alerta"
                 required
               />
             </div>
 
-            {/* Descripción */}
             <div>
-              <label htmlFor="descripcion" className="block text-sm font-medium text-gray-300 mb-2">
+              <label htmlFor="descripcion" className="block text-sm font-medium text-gray-700 mb-2">
                 Descripción <span className="text-red-500">*</span>
               </label>
               <textarea
@@ -200,16 +193,13 @@ function EditAlert() {
                 value={formData.descripcion}
                 onChange={handleChange}
                 rows="4"
-                
-                className="w-full px-4 py-2 bg-gray-700 border border-gray-600 text-white rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition resize-none"
+                className="w-full px-4 py-2 bg-white border border-gray-300 text-gray-900 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition resize-none"
                 placeholder="Ingrese la descripción de la alerta"
                 required
               />
             </div>
-
-            {/* Nivel */}
             <div>
-              <label htmlFor="nivel" className="block text-sm font-medium text-gray-300 mb-2">
+              <label htmlFor="nivel" className="block text-sm font-medium text-gray-700 mb-2">
                 Nivel de Alerta <span className="text-red-500">*</span>
               </label>
               <select
@@ -217,8 +207,7 @@ function EditAlert() {
                 name="nivel"
                 value={formData.nivel}
                 onChange={handleChange}
-                
-                className="w-full px-4 py-2 bg-gray-700 border border-gray-600 text-white rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition"
+                className="w-full px-4 py-2 bg-white border border-gray-300 text-gray-900 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
                 required
               >
                 <option value="">Seleccione un nivel</option>
@@ -229,9 +218,8 @@ function EditAlert() {
               </select>
             </div>
 
-            {/* Región */}
             <div>
-              <label htmlFor="region_id" className="block text-sm font-medium text-gray-300 mb-2">
+              <label htmlFor="region_id" className="block text-sm font-medium text-gray-700 mb-2">
                 Región
               </label>
               <select
@@ -239,8 +227,7 @@ function EditAlert() {
                 name="region_id"
                 value={formData.region_id}
                 onChange={handleChange}
-                
-                className="w-full px-4 py-2 bg-gray-700 border border-gray-600 text-white rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition"
+                className="w-full px-4 py-2 bg-white border border-gray-300 text-gray-900 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
               >
                 <option value="">Seleccione una región</option>
                 {regiones.map(region => (
@@ -251,12 +238,12 @@ function EditAlert() {
               </select>
             </div>
 
-            {/* Botones */}
+           
             <div className="flex gap-4 pt-4">
               <button
                 type="submit"
                 disabled={loading}
-                className="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg transition-colors duration-200 disabled:bg-gray-600 disabled:cursor-not-allowed"
+                className="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg transition-colors duration-200 disabled:bg-blue-300 disabled:cursor-not-allowed"
               >
                 {loading ? (
                   <span className="flex items-center justify-center">
@@ -274,7 +261,7 @@ function EditAlert() {
               <button
                 type="button"
                 onClick={() => navigate('/admin/view-alert')} 
-                className="flex-1 bg-gray-600 hover:bg-gray-500 text-white font-medium py-2 px-4 rounded-lg transition-colors duration-200"
+                className="flex-1 bg-white hover:bg-gray-50 text-gray-700 font-medium py-2 px-4 rounded-lg border border-gray-300 transition-colors duration-200"
               >
                 Cancelar
               </button>

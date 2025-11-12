@@ -5,7 +5,7 @@ import markerIconUrl from 'leaflet/dist/images/marker-icon.png'
 import markerShadowUrl from 'leaflet/dist/images/marker-shadow.png'
 import axios from 'axios'
 
-// Asegurar los íconos por defecto del marcador
+
 L.Icon.Default.mergeOptions({
   iconUrl: markerIconUrl,
   shadowUrl: markerShadowUrl,
@@ -16,11 +16,13 @@ export default function ReportForm() {
   const [descripcion, setDescripcion] = useState('')
   const [position, setPosition] = useState(null)
   const [fotoUrl, setFotoUrl] = useState('')
+  const [subiendo, setSubiendo] = useState(false)
+
   const mapRef = useRef(null)
   const markerRef = useRef(null)
-  const defaultCenter = [13.9946, -89.5597] // Santa Ana, El Salvador
+  const defaultCenter = [13.9946, -89.5597] 
 
-  // Intentar obtener la ubicación del usuario
+ 
   useEffect(() => {
     if (!position && navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
@@ -30,7 +32,7 @@ export default function ReportForm() {
     }
   }, [])
 
-  // Inicializar mapa con Leaflet
+
   useEffect(() => {
     if (mapRef.current) return
     const map = L.map('report-map', { center: defaultCenter, zoom: 13 })
@@ -38,18 +40,13 @@ export default function ReportForm() {
       attribution: '&copy; OpenStreetMap contributors',
     }).addTo(map)
 
-    if (position) {
-      markerRef.current = L.marker(position).addTo(map)
-    }
+    if (position) markerRef.current = L.marker(position).addTo(map)
 
-    map.on('click', function (e) {
+    map.on('click', (e) => {
       const { lat, lng } = e.latlng
       setPosition([lat, lng])
-      if (markerRef.current) {
-        markerRef.current.setLatLng([lat, lng])
-      } else {
-        markerRef.current = L.marker([lat, lng]).addTo(map)
-      }
+      if (markerRef.current) markerRef.current.setLatLng([lat, lng])
+      else markerRef.current = L.marker([lat, lng]).addTo(map)
     })
 
     mapRef.current = map
@@ -62,7 +59,7 @@ export default function ReportForm() {
     }
   }, [])
 
-  // Mantener marcador sincronizado
+
   useEffect(() => {
     if (!mapRef.current) return
     if (position) {
@@ -72,7 +69,40 @@ export default function ReportForm() {
     }
   }, [position])
 
-  // ✅ Enviar reporte al backend
+
+  const handleFileChange = async (e) => {
+    const file = e.target.files[0]
+    if (!file) return
+
+    const formData = new FormData()
+    formData.append('file', file)
+    formData.append('upload_preset', import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET)
+
+    try {
+      setSubiendo(true)
+      const res = await fetch(
+        `https://api.cloudinary.com/v1_1/${import.meta.env.VITE_CLOUDINARY_CLOUD_NAME}/image/upload`,
+        {
+          method: 'POST',
+          body: formData,
+        }
+      )
+      const data = await res.json()
+      if (data.secure_url) {
+        setFotoUrl(data.secure_url)
+        alert('Imagen subida correctamente ✅')
+      } else {
+        console.error('Error al subir imagen:', data)
+        alert('Error al subir la imagen ❌')
+      }
+    } catch (err) {
+      console.error('Error en la subida:', err)
+      alert('Error en la conexión ❌')
+    } finally {
+      setSubiendo(false)
+    }
+  }
+
   const handleSubmit = async (e) => {
     e.preventDefault()
     if (!position) {
@@ -80,14 +110,11 @@ export default function ReportForm() {
       return
     }
 
-    // 🔹 Obtener el usuario guardado en sesión
     let usuarioSesion = null
     try {
-      // Intenta usar la importación dinámica, si falla, usa localStorage
       const storageMod = await import('../Storage/storage')
       usuarioSesion = storageMod.default.get('user') || storageMod.default.get('usuario')
     } catch (err) {
-      // Fallback para entornos donde la importación dinámica falla o si se usa almacenamiento nativo
       usuarioSesion = JSON.parse(localStorage.getItem('user') || localStorage.getItem('usuario') || 'null')
     }
 
@@ -102,27 +129,25 @@ export default function ReportForm() {
       return
     }
 
-    // 🔹 Crear el cuerpo de la petición (como lo espera el backend)
     const payload = {
       tipo,
       descripcion,
       latitud: Number(position[0]),
       longitud: Number(position[1]),
-      // 📌 CORRECCIÓN: Agregar el campo 'fecha' con la hora de creación actual.
-      fecha: new Date().toISOString(), 
-      usuario: {
-        usuarioId: usuarioId
-      },
-      fotoUrl: fotoUrl || null 
+      fecha: new Date().toISOString(),
+      usuario: { usuarioId },
+      fotoUrl: fotoUrl || null,
     }
 
     try {
-      // Se asume que el backend usa la ruta /api/reportes
+      
+      console.log('Preparando envío de reporte. fotoUrl state:', fotoUrl)
+      console.log('Payload que se enviará al backend:', payload)
+
       const response = await axios.post(`${import.meta.env.VITE_BACKEND_URL}/api/reportes`, payload)
       console.log('Respuesta del servidor:', response.data)
       alert('Reporte enviado exitosamente ✅')
 
-      // 🔹 Limpiar el formulario
       setTipo('')
       setDescripcion('')
       setFotoUrl('')
@@ -164,25 +189,16 @@ export default function ReportForm() {
               />
             </div>
 
-           
-
-            {/* ✅ Campo para ingresar URL de la imagen */}
+            {/* Subida de imagen */}
             <div className="mb-3">
-              <label className="form-label">Foto (URL opcional)</label>
-              <input
-                type="url"
-                className="form-control"
-                placeholder="https://ejemplo.com/imagen.jpg"
-                value={fotoUrl}
-                onChange={(e) => setFotoUrl(e.target.value)}
-              />
+              <label className="form-label">Foto (desde tu computadora)</label>
+              <input type="file" accept="image/*" onChange={handleFileChange} disabled={subiendo} />
+              {subiendo && <p className="text-info">Subiendo imagen...</p>}
               {fotoUrl && (
-                <img
-                  src={fotoUrl}
-                  alt="preview"
-                  className="img-fluid mt-2"
-                  style={{ maxHeight: '200px', objectFit: 'cover' }}
-                />
+                <div>
+                  <p>Preview:</p>
+                  <img src={fotoUrl} alt="Preview" style={{ maxWidth: '200px' }} />
+                </div>
               )}
             </div>
 
@@ -208,16 +224,14 @@ export default function ReportForm() {
               />
             </div>
 
-            <button className="btn btn-primary" type="submit">
+            <button className="btn btn-primary" type="submit" disabled={subiendo}>
               Guardar reporte
             </button>
           </form>
         </div>
 
         <div className="col-md-6">
-          <label className="form-label">
-            Selecciona ubicación en el mapa (click)
-          </label>
+          <label className="form-label">Selecciona ubicación en el mapa (click)</label>
           <div style={{ height: 420, width: '100%' }}>
             <div id="report-map" style={{ height: '100%', width: '100%' }} />
           </div>

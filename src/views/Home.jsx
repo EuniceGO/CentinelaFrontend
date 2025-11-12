@@ -90,7 +90,7 @@ function Home() {
         <section className="mb-12">
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-2xl font-extrabold text-white">Emergencias Recientes</h3>
-            <Link to="/emergencias" className="text-indigo-400 text-sm">VER TODOS</Link>
+            <Link to="/ver-emergencias" className="text-indigo-400 text-sm">VER TODOS</Link>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-4">
             {emergencias.slice(0, HOME_LIMIT).map((e) => renderCard(e, false))}
