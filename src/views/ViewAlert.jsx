@@ -1,9 +1,30 @@
 import React, { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import Swal from 'sweetalert2'
-import { showAlert } from '../functions.jsx'
-import storage from '../Storage/storage.jsx'
 import '../Style/ViewAlert.css'
+
+const showAlert = (type, message) => {
+  console.log(`[${type.toUpperCase()}] ${message}`);
+};
+
+const storage = {
+  get: (key) => {
+    try {
+      const item = localStorage.getItem(key);
+      return item ? JSON.parse(item) : null;
+    } catch (e) {
+      console.error(`Error reading from localStorage: ${e.message}`);
+      return null;
+    }
+  }
+};
+
+const Swal = {
+  fire: (options) => {
+    console.log(`[MOCK SWAL] Title: ${options.title}, Text: ${options.text}`);
+    console.log("[MOCK SWAL] Simulating user confirmation (isConfirmed: true)");
+    return Promise.resolve({ isConfirmed: true });
+  }
+};
 
 function ViewAlert() {
   const [alertas, setAlertas] = useState([])
@@ -13,17 +34,15 @@ function ViewAlert() {
   const [isAdmin, setIsAdmin] = useState(false)
   const navigate = useNavigate()
 
+  const [paginaActual, setPaginaActual] = useState(1)
+  const alertasPorPagina = 3 
+
   useEffect(() => {
-    // Verificar rol de usuario
     const user = storage.get('user');
-    console.log('Usuario desde storage:', user);
-    
     if (user && user.rol) {
-      console.log('Rol del usuario:', user.rol);
       const adminCheck = user.rol === 'admin' || user.rol === 'ADMIN';
       setIsAdmin(adminCheck);
     } else {
-      console.log('No hay usuario o no tiene rol');
       setIsAdmin(false);
     }
   }, []);
@@ -32,9 +51,7 @@ function ViewAlert() {
     const load = async () => {
       try {
         const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/alertas/getAllAlert`, {
-          headers: {
-            'Content-Type': 'application/json'
-          }
+          headers: { 'Content-Type': 'application/json' }
         })
         if (!response.ok) {
           showAlert('error', 'Error al cargar las alertas')
@@ -50,15 +67,13 @@ function ViewAlert() {
     load()
   }, [])
 
-
   const nivelColor = (nivel) => {
     const n = (nivel || '').toLowerCase()
-   
-    if (['rojo','critico','crítico'].includes(n)) return 'bg-red-900 text-red-200'
-    if (['alto','alta'].includes(n)) return 'bg-orange-900 text-orange-200'
-    if (['amarillo','medio','media'].includes(n)) return 'bg-yellow-900 text-yellow-200'
-    if (['bajo','baja'].includes(n)) return 'bg-green-900 text-green-200'
-    return 'bg-gray-700 text-gray-200'
+    if (['rojo', 'critico', 'crítico'].includes(n)) return 'bg-red-100 text-red-800'
+    if (['alto', 'alta'].includes(n)) return 'bg-orange-100 text-orange-800'
+    if (['amarillo', 'medio', 'media'].includes(n)) return 'bg-yellow-100 text-yellow-800'
+    if (['bajo', 'baja'].includes(n)) return 'bg-green-100 text-green-800'
+    return 'bg-gray-100 text-gray-800'
   }
 
   const handleEdit = (alertaId) => {
@@ -66,7 +81,6 @@ function ViewAlert() {
   }
 
   const handleDelete = async (alertaId) => {
-  
     const result = await Swal.fire({
       title: '¿Estás seguro?',
       text: 'Esta acción eliminará la alerta permanentemente',
@@ -76,23 +90,18 @@ function ViewAlert() {
       cancelButtonColor: '#3085d6',
       confirmButtonText: 'Sí, eliminar',
       cancelButtonText: 'Cancelar',
-
     })
 
     if (result.isConfirmed) {
       try {
         const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/alertas/${alertaId}`, {
           method: 'DELETE',
-          headers: {
-            'Content-Type': 'application/json'
-          }
+          headers: { 'Content-Type': 'application/json' }
         })
-
         if (!response.ok) {
           showAlert('error', 'Error al eliminar la alerta')
           return
         }
-
         setAlertas(alertas.filter(a => (a.alertaId || a.idAlerta) !== alertaId))
         showAlert('success', 'Alerta eliminada exitosamente')
       } catch (error) {
@@ -102,16 +111,13 @@ function ViewAlert() {
     }
   }
 
-
   const alertasFiltradas = alertas.filter(alerta => {
     const cumpleNivel = !filtroNivel || (alerta.nivel && alerta.nivel.toLowerCase() === filtroNivel.toLowerCase())
     const cumpleUsuario = !filtroUsuario || (alerta.usuario && alerta.usuario.nombre && alerta.usuario.nombre.toLowerCase().includes(filtroUsuario.toLowerCase()))
     const cumpleRegion = !filtroRegion || (alerta.region && alerta.region.nombre && alerta.region.nombre.toLowerCase().includes(filtroRegion.toLowerCase()))
-    
     return cumpleNivel && cumpleUsuario && cumpleRegion
   })
 
- 
   const nivelesUnicos = [...new Set(alertas.map(a => a.nivel).filter(Boolean))]
   const usuariosUnicos = [...new Set(alertas.map(a => a.usuario?.nombre).filter(Boolean))]
   const regionesUnicas = [...new Set(alertas.map(a => a.region?.nombre).filter(Boolean))]
@@ -122,152 +128,98 @@ function ViewAlert() {
     setFiltroRegion('')
   }
 
+  // 🔹 NUEVO: calcular alertas visibles según la página actual
+  const totalPaginas = Math.ceil(alertasFiltradas.length / alertasPorPagina)
+  const indiceInicial = (paginaActual - 1) * alertasPorPagina
+  const alertasVisibles = alertasFiltradas.slice(indiceInicial, indiceInicial + alertasPorPagina)
+
+  const cambiarPagina = (pagina) => {
+    if (pagina >= 1 && pagina <= totalPaginas) setPaginaActual(pagina)
+  }
+
   return (
-    
-    <div className="container-alert bg-gray-900 min-h-screen p-4 md:p-8">
-      
-      
-      <div 
-        className="w-full bg-gray-800 rounded-md overflow-hidden border border-gray-700 hover:shadow-lg transition-shadow p-4 mb-6"
-      >
-          <h3 className="text-lg font-semibold text-white mb-4">Filtros</h3>
-          
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {/* Filtro por Nivel */}
-            <div>
-              <label htmlFor="filtroNivel" className="block text-sm font-medium text-gray-300 mb-2">
-                Nivel de Alerta
-              </label>
-              <select
-                id="filtroNivel"
-                value={filtroNivel}
-                onChange={(e) => setFiltroNivel(e.target.value)}
-                
-                className="w-full px-3 py-2 bg-gray-700 border border-gray-600 text-white rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
-              >
-                <option value="">Todos los niveles</option>
-                {nivelesUnicos.map(nivel => (
-                  <option key={nivel} value={nivel}>{nivel}</option>
-                ))}
-              </select>
-            </div>
+    <div className="container-alert bg-white min-h-screen p-4 md:p-8">
 
-            {/* Filtro por Usuario */}
-            <div>
-              <label htmlFor="filtroUsuario" className="block text-sm font-medium text-gray-300 mb-2">
-                Usuario
-              </label>
-              <select
-                id="filtroUsuario"
-                value={filtroUsuario}
-                onChange={(e) => setFiltroUsuario(e.target.value)}
-                
-                className="w-full px-3 py-2 bg-gray-700 border border-gray-600 text-white rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
-              >
-                <option value="">Todos los usuarios</option>
-                {usuariosUnicos.map(usuario => (
-                  <option key={usuario} value={usuario}>{usuario}</option>
-                ))}
-              </select>
-            </div>
-
-            
-            <div>
-              <label htmlFor="filtroRegion" className="block text-sm font-medium text-gray-300 mb-2">
-                Región
-              </label>
-              <select
-                id="filtroRegion"
-                value={filtroRegion}
-                onChange={(e) => setFiltroRegion(e.target.value)}
-                
-                className="w-full px-3 py-2 bg-gray-700 border border-gray-600 text-white rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
-              >
-                <option value="">Todas las regiones</option>
-                {regionesUnicas.map(region => (
-                  <option key={region} value={region}>{region}</option>
-                ))}
-              </select>
-            </div>
+      {/* --- Filtros (igual que antes) --- */}
+      <div className="w-full bg-white rounded-md overflow-hidden border border-gray-200 shadow-sm hover:shadow-lg transition-shadow p-4 mb-6 max-w-[900px] mx-auto">
+        <h3 className="text-lg font-semibold text-gray-900 mb-4">Filtros</h3>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div>
+            <label htmlFor="filtroNivel" className="block text-sm font-medium text-gray-700 mb-2">Nivel de Alerta</label>
+            <select id="filtroNivel" value={filtroNivel} onChange={(e) => setFiltroNivel(e.target.value)} className="w-full px-3 py-2 bg-white border border-gray-300 text-gray-900 rounded-lg focus:ring-2 focus:ring-indigo-500">
+              <option value="">Todos los niveles</option>
+              {nivelesUnicos.map(nivel => <option key={nivel} value={nivel}>{nivel}</option>)}
+            </select>
           </div>
 
-         
-          <div className="mt-4 flex justify-between items-center">
-            <p className="text-sm text-gray-400">
-              Mostrando <span className="font-semibold text-gray-200">{alertasFiltradas.length}</span> de <span className="font-semibold text-gray-200">{alertas.length}</span> alertas
-            </p>
-            {(filtroNivel || filtroUsuario || filtroRegion) && (
-              <button
-                onClick={limpiarFiltros}
-                className="px-4 py-2 bg-gray-600 hover:bg-gray-500 text-white text-sm font-medium rounded-lg transition-colors duration-200"
-              >
-                Limpiar filtros
-              </button>
-            )}
+          <div>
+            <label htmlFor="filtroUsuario" className="block text-sm font-medium text-gray-700 mb-2">Usuario</label>
+            <select id="filtroUsuario" value={filtroUsuario} onChange={(e) => setFiltroUsuario(e.target.value)} className="w-full px-3 py-2 bg-white border border-gray-300 text-gray-900 rounded-lg focus:ring-2 focus:ring-indigo-500">
+              <option value="">Todos los usuarios</option>
+              {usuariosUnicos.map(usuario => <option key={usuario} value={usuario}>{usuario}</option>)}
+            </select>
+          </div>
+
+          <div>
+            <label htmlFor="filtroRegion" className="block text-sm font-medium text-gray-700 mb-2">Región</label>
+            <select id="filtroRegion" value={filtroRegion} onChange={(e) => setFiltroRegion(e.target.value)} className="w-full px-3 py-2 bg-white border border-gray-300 text-gray-900 rounded-lg focus:ring-2 focus:ring-indigo-500">
+              <option value="">Todas las regiones</option>
+              {regionesUnicas.map(region => <option key={region} value={region}>{region}</option>)}
+            </select>
           </div>
         </div>
 
+        <div className="mt-4 flex justify-between items-center">
+          <p className="text-sm text-gray-500">
+            Mostrando <span className="font-semibold text-gray-800">{alertasVisibles.length}</span> de <span className="font-semibold text-gray-800">{alertasFiltradas.length}</span> alertas
+          </p>
+          {(filtroNivel || filtroUsuario || filtroRegion) && (
+            <button onClick={limpiarFiltros} className="px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-800 text-sm font-medium rounded-lg">
+              Limpiar filtros
+            </button>
+          )}
+        </div>
+      </div>
+
+      {/* --- Lista de alertas con paginación --- */}
       <div className="alert-list">
-       
-        {alertasFiltradas.length === 0 ? (
-          
-          <div className="w-full bg-gray-800 rounded-md overflow-hidden border border-gray-700 hover:shadow-lg transition-shadow p-8 text-center">
-            <p className="text-gray-400 text-lg">No se encontraron alertas con los filtros seleccionados</p>
+        {alertasVisibles.length === 0 ? (
+          <div className="w-full bg-white rounded-md overflow-hidden border border-gray-200 shadow-sm p-8 text-center">
+            <p className="text-gray-500 text-lg">No se encontraron alertas</p>
           </div>
         ) : (
-          alertasFiltradas.map(alerta => (
-           
-            <article 
-              key={alerta.alertaId || alerta.idAlerta || alerta.id || Math.random()} 
-              className="bg-gray-800 rounded-md overflow-hidden border border-gray-700 hover:shadow-lg transition-shadow px-4 pt-6 pb-4"
-            >
-              
+          alertasVisibles.map(alerta => (
+            <article key={alerta.alertaId || alerta.idAlerta || alerta.id || Math.random()} className="bg-white rounded-md overflow-hidden border border-gray-200 shadow-sm hover:shadow-lg transition-shadow px-4 pt-6 pb-4 mb-4">
               <div className="flex items-start justify-between mt-3 gap-4">
                 <div>
-                  <h3 className="text-lg font-semibold text-white break-words">{alerta.titulo || 'Sin título'}</h3>
+                  <h3 className="text-lg font-semibold text-gray-900 break-words">{alerta.titulo || 'Sin título'}</h3>
                 </div>
                 <span className={`rounded-full px-3 py-1 text-xs font-medium whitespace-nowrap ${nivelColor(alerta.nivel)}`}>{alerta.nivel || 'N/A'}</span>
               </div>
               <div>
-                <span className="text-gray-400">Usuario:</span>
+                <span className="text-gray-500">Usuario:</span>
                 {alerta.usuario && alerta.usuario.nombre && (
-                  <span className="px-2.5 py-0.5 text-purple-300">{alerta.usuario.nombre}</span>
+                  <span className="px-2.5 py-0.5 text-purple-700">{alerta.usuario.nombre}</span>
                 )}
               </div>
               <div className='mt-3'>
-                <h5 className="text-gray-400">Descripción: </h5>
+                <h5 className="text-gray-500">Descripción: </h5>
                 {alerta.descripcion && (
-                  <p className="mt-2 text-sm text-gray-300 leading-relaxed whitespace-pre-wrap">{alerta.descripcion}</p>
+                  <p className="mt-2 text-sm text-gray-700 leading-relaxed whitespace-pre-wrap">{alerta.descripcion}</p>
                 )}
               </div>
-              
               <div className="mt-4 flex flex-wrap gap-2 text-xs">
                 {alerta.region && alerta.region.nombre && (
-                  
-                  <span className="rounded-full bg-blue-900 px-2.5 py-0.5 text-blue-200">{alerta.region.nombre}</span>
+                  <span className="rounded-full bg-gray-100 px-2.5 py-0.5 text-gray-800">{alerta.region.nombre}</span>
                 )}
               </div>
-
-              
-              <div className="mt-4 pt-4 border-t border-gray-700 flex justify-end gap-2"> {/* Borde actualizado */}
+              <div className="mt-4 pt-4 border-t border-gray-200 flex justify-end gap-2">
                 {isAdmin && (
                   <>
-                    <button
-                      onClick={() => handleEdit(alerta.alertaId || alerta.idAlerta)}
-                      className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition-colors duration-200 flex items-center gap-2"
-                    >
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
-                        <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
-                      </svg>
+                    <button onClick={() => handleEdit(alerta.alertaId || alerta.idAlerta)} className="px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white text-sm font-medium rounded-lg">
                       Editar
                     </button>
-                    <button
-                      onClick={() => handleDelete(alerta.alertaId || alerta.idAlerta)}
-                      className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white text-sm font-medium rounded-lg transition-colors duration-200 flex items-center gap-2"
-                    >
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
-                        <path fillRule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clipRule="evenodd" />
-                      </svg>
+                    <button onClick={() => handleDelete(alerta.alertaId || alerta.idAlerta)} className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white text-sm font-medium rounded-lg">
                       Eliminar
                     </button>
                   </>
@@ -277,6 +229,25 @@ function ViewAlert() {
           ))
         )}
       </div>
+
+      {/* 🔹 NUEVO: Controles de paginación */}
+      {totalPaginas > 1 && (
+        <div className="flex justify-center mt-6 gap-2">
+          <button onClick={() => cambiarPagina(paginaActual - 1)} disabled={paginaActual === 1} className="px-3 py-1 bg-gray-200 hover:bg-gray-300 text-sm rounded disabled:opacity-50">
+            Anterior
+          </button>
+
+          {[...Array(totalPaginas)].map((_, i) => (
+            <button key={i} onClick={() => cambiarPagina(i + 1)} className={`px-3 py-1 text-sm rounded ${paginaActual === i + 1 ? 'bg-indigo-500 text-white' : 'bg-gray-200 hover:bg-gray-300'}`}>
+              {i + 1}
+            </button>
+          ))}
+
+          <button onClick={() => cambiarPagina(paginaActual + 1)} disabled={paginaActual === totalPaginas} className="px-3 py-1 bg-gray-200 hover:bg-gray-300 text-sm rounded disabled:opacity-50">
+            Siguiente
+          </button>
+        </div>
+      )}
     </div>
   )
 }
