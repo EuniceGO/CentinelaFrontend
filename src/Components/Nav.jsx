@@ -91,7 +91,7 @@ function Navbar() {
                     </button>
                     {isEmergencytDropdownOpen && (
                       <div className="absolute left-0 mt-1 w-48 rounded-lg border bg-white shadow-lg divide-y divide-gray-100 z-50">
-                        <Link to="/emergencia" onClick={() => setIsEmergencytDropdownOpen(false)} className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">Emergencias </Link>
+                        <Link to="/emergencia" onClick={() => setIsEmergencytDropdownOpen(false)} className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">Crear Emergencias </Link>
                         <Link to="/emergencias" onClick={() => setIsEmergencytDropdownOpen(false)} className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">Ver Emergencias</Link>
                       </div>
                     )}
@@ -224,7 +224,7 @@ function Navbar() {
                 )}
                 
                 <Link to="/report" onClick={closeMobileMenu} className="text-gray-700 hover:text-indigo-600 block px-3 py-2 rounded-md text-base font-medium">Reporte</Link>
-                <Link to="/emergencia" onClick={closeMobileMenu} className="text-gray-700 hover:text-indigo-600 block px-3 py-2 rounded-md text-base font-medium">Emergencia</Link>
+                <Link to="/emergencia" onClick={closeMobileMenu} className="text-gray-700 hover:text-indigo-600 block px-3 py-2 rounded-md text-base font-medium">Crear Emergencia</Link>
                 <Link to="/emergencias" onClick={closeMobileMenu} className="text-gray-700 hover:text-indigo-600 block px-3 py-2 rounded-md text-base font-medium">Ver Emergencias</Link>
                 <Link to="/dashboard" onClick={closeMobileMenu} className="text-gray-700 hover:text-indigo-600 block px-3 py-2 rounded-md text-base font-medium">Dashboard</Link>
                 <Link to="/reports" onClick={closeMobileMenu} className="text-gray-700 hover:text-indigo-600 block px-3 py-2 rounded-md text-base font-medium">Ver Reportes</Link>

@@ -58,7 +58,7 @@ function App() {
               <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/report" element={<ReportForm />} />
               <Route path="/emergencia" element={<EmergenciaForm />} />
-              <Route path="/emergencias" element={<Emergencias />} />
+              <Route path="/ver-emergencias" element={<Emergencias />} />
               <Route path="/emergencia/:id" element={<EmergenciaDetail />} />
                <Route path="/estadisticas" element={<Estadisticas />} />
               <Route path="/alert" element={<Alert />} />

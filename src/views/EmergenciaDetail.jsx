@@ -37,14 +37,12 @@ export default function EmergenciaDetail() {
         }
     }, [id]);
 
-    // CORRECCIÓN: Se llama a fetchOne solo cuando la URL o la función de carga cambian.
-    // Esto previene el ciclo infinito (loop) que causaba la congelación.
+
     useEffect(() => {
         fetchOne();
         setUserRole(getUserRole());
     }, [fetchOne, id]); 
 
-    // Lógica para cambiar el estado 'Atendido' (Solo Admin)
     const handleToggleAtendido = async () => {
         if (!isAdmin || isUpdating || !emergencia) return;
         
@@ -110,7 +108,7 @@ export default function EmergenciaDetail() {
     }
 
 
-    // --- RENDERIZADO CONDICIONAL ---
+
 
     if (loading) return <div className="container mt-5"><div className="alert alert-info shadow-sm text-center" role="alert">Cargando detalles...</div></div>;
     if (error) return <div className="container mt-5"><div className="alert alert-danger shadow-sm text-center" role="alert">{error}</div></div>;
@@ -123,12 +121,12 @@ export default function EmergenciaDetail() {
         <div className="container my-5">
             <button 
                 className="btn btn-outline-secondary btn-sm mb-4 shadow-sm" 
-                onClick={() => navigate('/emergencias')}
+                onClick={() => navigate('/ver-emergencias')}
             >
                 ← Volver al Listado
             </button>
 
-            {/* Mensaje de Feedback Temporal */}
+       
             {feedback.message && (
                 <div className={`alert alert-${feedback.type} shadow-sm fade show mb-4`} role="alert">
                     {feedback.message}
@@ -147,13 +145,12 @@ export default function EmergenciaDetail() {
                 </div>
                 <div className="card-body p-5 bg-white">
                     
-                    {/* Mensaje Principal - Destacado */}
+                  
                     <div className="mb-5 border border-info p-4 rounded-3 bg-light shadow-sm">
                         <h6 className='text-info fw-bold fs-6 mb-3 border-bottom pb-1'>Mensaje Reportado:</h6>
                         <p className='lead mb-0 text-dark fs-5'>{emergencia.mensaje}</p>
                     </div>
-                    
-                    {/* Sección de Detalles y Ubicación */}
+                 
                     <div className="row g-4 mb-5">
                         <div className="col-md-6 border-end border-secondary-subtle pe-4"> 
                             <h6 className='text-primary fw-bold mb-3'>Detalles Generales</h6>
@@ -183,7 +180,7 @@ export default function EmergenciaDetail() {
                 </div>
             </div>
             
-            {/* Sección de Administración y Acciones - SOLO VISIBLE PARA ADMIN */}
+          
             {isAdmin ? (
                 <div className="p-4 rounded-3 border border-warning bg-light shadow-sm">
                     <h5 className="text-warning fw-bold mb-3 border-bottom pb-2">Acciones de Administración</h5>
