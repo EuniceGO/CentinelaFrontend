@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState, useCallback, useRef } from 'react';
 import { useParams, useLocation, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
@@ -19,9 +19,13 @@ export default function EmergenciaDetail() {
     const [userRole, setUserRole] = useState(getUserRole());
     const isAdmin = userRole === 'admin';
 
+    const mapRef = useRef(null)
+    const markerRef = useRef(null)
+    const leafletLoadedRef = useRef(false)
+    const [mapReady, setMapReady] = useState(false)
+
     const clearFeedback = () => setFeedback({ message: '', type: '' });
 
-    // Función para obtener los detalles por ID
     const fetchOne = useCallback(async () => {
         setLoading(true);
         setError(null);
@@ -42,6 +46,94 @@ export default function EmergenciaDetail() {
         fetchOne();
         setUserRole(getUserRole());
     }, [fetchOne, id]); 
+
+    useEffect(() => {
+        if (leafletLoadedRef.current) return
+        const load = async () => {
+            try {
+                if (!document.querySelector('link[href*="leaflet.css"]')) {
+                    const link = document.createElement('link')
+                    link.rel = 'stylesheet'
+                    link.href = 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.css'
+                    document.head.appendChild(link)
+                }
+                if (!window.L) {
+                    await new Promise((resolve, reject) => {
+                        const s = document.createElement('script')
+                        s.src = 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js'
+                        s.onload = resolve
+                        s.onerror = reject
+                        document.head.appendChild(s)
+                    })
+                }
+                leafletLoadedRef.current = true
+                console.log('✅ Leaflet cargado en EmergenciaDetail')
+            } catch (e) {
+                console.error('Error cargando Leaflet en detalle:', e)
+            }
+        }
+        load()
+    }, [])
+
+    useEffect(() => {
+        if (!leafletLoadedRef.current) return
+        if (!emergencia) return
+        if (mapRef.current) return
+
+        if (!window.L) return
+
+        try {
+            const lat = emergencia.latitud ?? emergencia.lat ?? emergencia.latitude ?? emergencia.y
+            const lng = emergencia.longitud ?? emergencia.lng ?? emergencia.longitude ?? emergencia.x
+            const latNum = Number(lat)
+            const lngNum = Number(lng)
+            if (isNaN(latNum) || isNaN(lngNum)) return
+
+            const map = window.L.map('emergencia-detail-map', {
+                center: [latNum, lngNum],
+                zoom: 14,
+                scrollWheelZoom: false
+            })
+            window.L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '© OpenStreetMap contributors',
+                maxZoom: 18
+            }).addTo(map)
+
+            const svg = `data:image/svg+xml;utf8,${encodeURIComponent(`
+                <svg xmlns='http://www.w3.org/2000/svg' width='36' height='36' viewBox='0 0 36 36'>
+                  <circle cx='18' cy='12' r='8' fill='#ef4444' stroke='white' stroke-width='2'/>
+                  <path d='M18 22 C23 22 27 26 18 32 C9 26 13 22 18 22 Z' fill='#ef4444' stroke='white' stroke-width='1'/>
+                </svg>
+            `)}`
+
+            const icon = window.L.icon({ iconUrl: svg, iconSize: [36,36], iconAnchor: [18,36], popupAnchor: [0,-36] })
+
+            const marker = window.L.marker([latNum, lngNum], { icon }).addTo(map)
+            const popupContent = `
+                <div style="max-width:260px">
+                  <strong>Emergencia #${emergencia.emergenciaId || id}</strong><br/>
+                  <div style="margin-top:6px">${(emergencia.mensaje || '').slice(0,300)}</div>
+                </div>
+            `
+            marker.bindPopup(popupContent)
+            marker.openPopup()
+
+            mapRef.current = map
+            markerRef.current = marker
+            setMapReady(true)
+        } catch (e) {
+            console.error('Error inicializando mapa detalle:', e)
+        }
+
+        return () => {
+            if (mapRef.current) {
+                mapRef.current.remove()
+                mapRef.current = null
+                markerRef.current = null
+                setMapReady(false)
+            }
+        }
+    }, [leafletLoadedRef.current, emergencia])
 
     const handleToggleAtendido = async () => {
         if (!isAdmin || isUpdating || !emergencia) return;
@@ -175,6 +267,11 @@ export default function EmergenciaDetail() {
                                 <strong className='text-dark'>Longitud:</strong> 
                                 <code className="bg-light text-secondary p-2 rounded ms-2 border d-block">{emergencia.longitud}</code> 
                             </p>
+                        
+                            {/* Mapa pequeño dentro del detalle */}
+                            <div className="mt-4" style={{ height: '260px' }}>
+                                <div id="emergencia-detail-map" style={{ height: '100%', width: '100%' }} />
+                            </div>
                         </div>
                     </div>
                 </div>

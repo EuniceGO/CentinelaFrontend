@@ -67,7 +67,6 @@ function Login() {
       
    
 
-      // 1. Falla de Conexión 
       if (error.code === 'ERR_NETWORK' || !error.response) {
         Swal.fire({
           title: 'Error de Conexión',

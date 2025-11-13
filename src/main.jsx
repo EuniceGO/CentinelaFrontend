@@ -15,7 +15,6 @@ window.axios.defaults.withCredentials = false
 window.axios.defaults.headers.common['Content-Type'] = 'application/json'
 window.axios.defaults.headers.common['Accept'] = 'application/json'
 
-//Punto de entrada de la aplicacion
 createRoot(document.getElementById('root')).render(
   <StrictMode>
     <App />

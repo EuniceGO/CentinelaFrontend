@@ -20,7 +20,6 @@ export const sendRequest =  async (method, params, url, redir='',token=true) => 
         response => {
             res = response.data,
             (method !='GET') ? showAlert(response.data.status, response.data.message, 'success') : ''
-            //Tiempo de espera para redireccionar
             setTimeout(() =>  (redir != '') ? window.location.href = redir : '' , 2000);
         }).catch( (error) => {
             let desc='';

@@ -14,7 +14,6 @@ function ViewAlert() {
   const navigate = useNavigate()
 
   useEffect(() => {
-    // Determinar si el usuario es admin
     const user = storage.get('user')
     if (user && typeof user.rol === 'string') {
       setIsAdmin(user.rol.toLowerCase() === 'admin')
@@ -44,7 +43,6 @@ function ViewAlert() {
 
   const nivelColor = (nivel) => {
     const n = (nivel || '').toLowerCase()
-    // Usamos fondos más oscuros y texto más claro
     if (['rojo','critico','crítico'].includes(n)) return 'bg-red-900 text-red-200'
     if (['alto','alta'].includes(n)) return 'bg-orange-900 text-orange-200'
     if (['amarillo','medio','media'].includes(n)) return 'bg-yellow-900 text-yellow-200'
