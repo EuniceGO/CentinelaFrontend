@@ -252,21 +252,6 @@ export default function ReportDetail() {
       default: return 'secondary';
     }
   };
-  
-  /**
-   * ✅ CORRECCIÓN: Función para obtener la fecha del reporte.
-   * Busca la fecha en campos comunes (fecha, createdAt, creadoEn).
-   */
-  const getReportDate = (rep) => {
-    // Intenta usar campos comunes
-    const dateString = rep.fecha || rep.createdAt || rep.creadoEn || null;
-    if (dateString) {
-      const date = new Date(dateString);
-      if (!isNaN(date)) return date;
-    }
-    // Si no se encuentra o es inválido, retorna la fecha actual como último recurso (idealmente no debería pasar)
-    return new Date();
-  };
 
   /**
    * 📌 MEJORA: Asegura usar la propiedad 'fecha' del comentario.
@@ -314,8 +299,6 @@ export default function ReportDetail() {
       </div>
     );
   }
-
-  const reportDate = getReportDate(report);
 
   // --- CUERPO DEL COMPONENTE ---
 
@@ -367,9 +350,8 @@ export default function ReportDetail() {
                 <div className="col-md-6">
                   <div className="p-3 border rounded bg-light">
                     <small className="text-muted d-block text-uppercase fw-semibold">Fecha de Reporte</small>
-                    {/* ✅ CORRECCIÓN APLICADA AQUÍ */}
                     <h4 className="fw-bold mb-0">
-                      {reportDate.toLocaleDateString('es-SV', { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
+                      {report.fecha_hora || 'Fecha no disponible'}
                     </h4>
                   </div>
                 </div>

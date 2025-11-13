@@ -9,12 +9,13 @@ import App from './App.jsx'
 
 
 window.axios = axios
-window.axios.defaults.baseURL = import.meta.env.VITE_BACKEND_URL
+window.axios.defaults.baseURL = 'http://localhost:5174/centinela/'
 window.axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest'
-window.axios.defaults.withCredentials = false
+window.axios.defaults.withCredentials = true
 window.axios.defaults.headers.common['Content-Type'] = 'application/json'
 window.axios.defaults.headers.common['Accept'] = 'application/json'
 
+//Punto de entrada de la aplicacion
 createRoot(document.getElementById('root')).render(
   <StrictMode>
     <App />
