@@ -41,7 +41,7 @@ const getReportCoords = (report) => {
 };
 
 // Custom Hook para gestionar el mapa de Leaflet
-const useLeafletMap = (reports, filterType, filterState, searchTerm) => {
+const useLeafletMap = (reports, filterType, filterState, searchTerm, startTime, endTime) => {
   const mapRef = useRef(null);
   const markersLayerRef = useRef(null);
   const markersRef = useRef({});
@@ -77,7 +77,39 @@ const useLeafletMap = (reports, filterType, filterState, searchTerm) => {
         r.descripcion?.toLowerCase().includes(searchTerm.toLowerCase()) ||
         r.usuario?.nombre?.toLowerCase().includes(searchTerm.toLowerCase()) ||
         String(getReportId(r)).includes(searchTerm);
-      return matchType && matchState && matchSearch;
+      
+      // Filtro de hora (solo reportes de hoy)
+      let matchTime = true;
+      if (startTime || endTime) {
+        const reportDate = new Date(r.fecha_hora);
+        const today = new Date();
+        
+        // Solo filtrar si el reporte es de hoy
+        const isToday = reportDate.toDateString() === today.toDateString();
+        
+        if (isToday) {
+          const reportHour = reportDate.getHours();
+          const reportMinute = reportDate.getMinutes();
+          const reportTimeValue = reportHour * 60 + reportMinute;
+          
+          if (startTime) {
+            const [startHour, startMin] = startTime.split(':').map(Number);
+            const startTimeValue = startHour * 60 + startMin;
+            matchTime = matchTime && reportTimeValue >= startTimeValue;
+          }
+          
+          if (endTime) {
+            const [endHour, endMin] = endTime.split(':').map(Number);
+            const endTimeValue = endHour * 60 + endMin;
+            matchTime = matchTime && reportTimeValue <= endTimeValue;
+          }
+        } else if (startTime || endTime) {
+          // Si hay filtro de hora pero el reporte no es de hoy, excluirlo
+          matchTime = false;
+        }
+      }
+      
+      return matchType && matchState && matchSearch && matchTime;
     });
 
     const latlngs = [];
@@ -114,7 +146,7 @@ const useLeafletMap = (reports, filterType, filterState, searchTerm) => {
       else if (latlngs.length > 1) map.fitBounds(latlngs, { padding: [50, 50] });
       else map.setView([13.9946, -89.5597], 6);
     }
-  }, [reports, filterType, filterState, searchTerm]);
+  }, [reports, filterType, filterState, searchTerm, startTime, endTime]);
 
   // Función para centrar el mapa en un marcador específico
   const focusOnMarker = useCallback((reportId) => {
@@ -148,6 +180,8 @@ export default function Reports() {
   const [filterType, setFilterType] = useState('');
   const [filterState, setFilterState] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
+  const [startTime, setStartTime] = useState('');
+  const [endTime, setEndTime] = useState('');
   const [userRole, setUserRole] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
@@ -181,7 +215,7 @@ export default function Reports() {
 
 
   // Lógica de Mapeo (Custom Hook) - Ahora devuelve la función focusOnMarker
-  const focusOnMarker = useLeafletMap(reports, filterType, filterState, searchTerm);
+  const focusOnMarker = useLeafletMap(reports, filterType, filterState, searchTerm, startTime, endTime);
 
 
   // Lógica de Manipulación de Datos
@@ -258,6 +292,8 @@ export default function Reports() {
     setFilterType('');
     setFilterState('');
     setSearchTerm('');
+    setStartTime('');
+    setEndTime('');
     setCurrentPage(1);
   }, []);
 
@@ -270,8 +306,40 @@ export default function Reports() {
       r.descripcion?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       r.usuario?.nombre?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       String(getReportId(r)).includes(searchTerm);
-    return matchType && matchState && matchSearch;
-  }), [reports, filterType, filterState, searchTerm]);
+    
+    // Filtro de hora (solo reportes de hoy)
+    let matchTime = true;
+    if (startTime || endTime) {
+      const reportDate = new Date(r.fecha_hora);
+      const today = new Date();
+      
+      // Solo filtrar si el reporte es de hoy
+      const isToday = reportDate.toDateString() === today.toDateString();
+      
+      if (isToday) {
+        const reportHour = reportDate.getHours();
+        const reportMinute = reportDate.getMinutes();
+        const reportTimeValue = reportHour * 60 + reportMinute;
+        
+        if (startTime) {
+          const [startHour, startMin] = startTime.split(':').map(Number);
+          const startTimeValue = startHour * 60 + startMin;
+          matchTime = matchTime && reportTimeValue >= startTimeValue;
+        }
+        
+        if (endTime) {
+          const [endHour, endMin] = endTime.split(':').map(Number);
+          const endTimeValue = endHour * 60 + endMin;
+          matchTime = matchTime && reportTimeValue <= endTimeValue;
+        }
+      } else if (startTime || endTime) {
+        // Si hay filtro de hora pero el reporte no es de hoy, excluirlo
+        matchTime = false;
+      }
+    }
+    
+    return matchType && matchState && matchSearch && matchTime;
+  }), [reports, filterType, filterState, searchTerm, startTime, endTime]);
 
   const uniqueTypes = useMemo(() => 
     [...new Set(reports.map(r => r.tipo).filter(Boolean))]
@@ -356,7 +424,7 @@ export default function Reports() {
                     <i className="bi bi-filter-circle-fill text-primary me-2"></i>
                     Herramientas de Filtrado
                 </h5>
-                {(filterType || filterState || searchTerm) && (
+                {(filterType || filterState || searchTerm || startTime || endTime) && (
                     <button className="btn btn-sm btn-outline-danger fw-medium" onClick={clearFilters}>
                         <i className="bi bi-x-circle me-1"></i>
                         Limpiar Filtros
@@ -395,6 +463,46 @@ export default function Reports() {
                         </select>
                     </div>
                     <div className="col-lg-4 col-md-6">
+                        <label className="form-label fw-semibold mb-2 text-muted small">
+                            <i className="bi bi-list-ul me-1"></i>
+                            Filtrar por Estado
+                        </label>
+                        <select 
+                            className="form-select form-select-lg shadow-sm" 
+                            value={filterState} 
+                            onChange={(e) => setFilterState(e.target.value)}
+                        >
+                            <option value="">Todos los Estados</option>
+                            {uniqueStates.map(estado => (
+                                <option key={estado} value={estado}>{estado}</option>
+                            ))}
+                        </select>
+                    </div>
+                </div>
+                <div className="row g-4 mt-2">
+                    <div className="col-lg-6 col-md-6">
+                        <label className="form-label fw-semibold mb-2 text-muted small">
+                            <i className="bi bi-clock me-1"></i>
+                            Hora Desde (solo reportes de hoy)
+                        </label>
+                        <input
+                            type="time"
+                            className="form-control form-control-lg shadow-sm"
+                            value={startTime}
+                            onChange={(e) => setStartTime(e.target.value)}
+                        />
+                    </div>
+                    <div className="col-lg-6 col-md-6">
+                        <label className="form-label fw-semibold mb-2 text-muted small">
+                            <i className="bi bi-clock me-1"></i>
+                            Hora Hasta (solo reportes de hoy)
+                        </label>
+                        <input
+                            type="time"
+                            className="form-control form-control-lg shadow-sm"
+                            value={endTime}
+                            onChange={(e) => setEndTime(e.target.value)}
+                        />
                     </div>
                 </div>
             </div>
