@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
+import axios from 'axios';
 import storage from '../Storage/storage';
 
 function Navbar() {
   const navigate = useNavigate();
   const location = useLocation(); 
+  const API_BASE_URL = `${import.meta.env.VITE_BACKEND_URL}/api`;
   
 
   const [isAuthenticated, setIsAuthenticated] = useState(
@@ -17,6 +19,11 @@ function Navbar() {
   const [isAlertDropdownOpen, setIsAlertDropdownOpen] = useState(false);
   const [isReportDropdownOpen, setIsReportDropdownOpen] = useState(false);
   const [isEmergencytDropdownOpen, setIsEmergencytDropdownOpen] = useState(false);
+  const [showPwdPane, setShowPwdPane] = useState(false);
+  const [newPwd, setNewPwd] = useState('');
+  const [confirmPwd, setConfirmPwd] = useState('');
+  const [savingPwd, setSavingPwd] = useState(false);
+  const [pwdMsg, setPwdMsg] = useState('');
 
 
   useEffect(() => {
@@ -51,6 +58,56 @@ function Navbar() {
     setIsAuthenticated(false); 
     setIsMobileMenuOpen(false); 
     navigate('/login'); 
+  };
+
+  const getCurrentUserId = () => {
+    try {
+      const u = storage.get('user') || JSON.parse(localStorage.getItem('user') || sessionStorage.getItem('user') || 'null');
+      if (!u) return null;
+      return u.usuarioId || u.usuario_id || u.id || u.user_id || null;
+    } catch (e) {
+      return null;
+    }
+  };
+
+  const submitPasswordChange = async () => {
+    setPwdMsg('');
+    if (!newPwd || !confirmPwd) {
+      setPwdMsg('Ingresa y confirma la nueva contraseña');
+      return;
+    }
+    if (newPwd.length < 6) {
+      setPwdMsg('La contraseña debe tener al menos 6 caracteres');
+      return;
+    }
+    if (newPwd !== confirmPwd) {
+      setPwdMsg('Las contraseñas no coinciden');
+      return;
+    }
+    const uid = getCurrentUserId();
+    if (!uid) {
+      setPwdMsg('No se pudo identificar al usuario');
+      return;
+    }
+    try {
+      setSavingPwd(true);
+      await axios.post(`${API_BASE_URL}/usuarios/${uid}/cambiar-contrasena`, {
+        nuevaContrasena: newPwd,
+        confirmarContrasena: confirmPwd,
+      });
+      setPwdMsg('Contraseña actualizada correctamente');
+      setNewPwd('');
+      setConfirmPwd('');
+      setTimeout(() => {
+        setShowPwdPane(false);
+        setPwdMsg('');
+      }, 1200);
+    } catch (err) {
+      const msg = err?.response?.data?.message || 'Error al actualizar contraseña';
+      setPwdMsg(msg);
+    } finally {
+      setSavingPwd(false);
+    }
   };
 
 
@@ -156,6 +213,59 @@ function Navbar() {
                   </>
                 )}
                 
+                <div className="relative">
+                  <button
+                    onClick={() => setShowPwdPane((v) => !v)}
+                    className="bg-white border border-indigo-600 text-indigo-600 hover:bg-indigo-50 px-4 py-2 rounded-md text-sm font-medium mr-2"
+                    type="button"
+                  >
+                    Cambiar contraseña
+                  </button>
+                  {showPwdPane && (
+                    <div className="absolute right-0 mt-2 w-72 bg-white border rounded-lg shadow-lg p-4 z-50">
+                      <h4 className="text-sm font-semibold mb-2">Actualizar contraseña</h4>
+                      <label className="block text-xs text-gray-600 mb-1">Nueva contraseña</label>
+                      <input
+                        type="password"
+                        className="w-full border rounded px-3 py-2 mb-2 text-sm"
+                        value={newPwd}
+                        onChange={(e) => setNewPwd(e.target.value)}
+                        placeholder="••••••"
+                      />
+                      <label className="block text-xs text-gray-600 mb-1">Confirmar contraseña</label>
+                      <input
+                        type="password"
+                        className="w-full border rounded px-3 py-2 mb-2 text-sm"
+                        value={confirmPwd}
+                        onChange={(e) => setConfirmPwd(e.target.value)}
+                        placeholder="••••••"
+                      />
+                      {pwdMsg && (
+                        <div className={`text-xs mb-2 ${pwdMsg.includes('correctamente') ? 'text-green-600' : 'text-red-600'}`}>
+                          {pwdMsg}
+                        </div>
+                      )}
+                      <div className="flex justify-end gap-2">
+                        <button
+                          type="button"
+                          className="px-3 py-1 rounded border text-sm"
+                          onClick={() => { setShowPwdPane(false); setPwdMsg(''); }}
+                          disabled={savingPwd}
+                        >
+                          Cancelar
+                        </button>
+                        <button
+                          type="button"
+                          className="px-3 py-1 rounded bg-indigo-600 text-white text-sm disabled:opacity-60"
+                          onClick={submitPasswordChange}
+                          disabled={savingPwd}
+                        >
+                          {savingPwd ? 'Guardando...' : 'Guardar'}
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </div>
                 <button
                   onClick={handleLogout}
                   className="bg-indigo-600 text-white hover:bg-indigo-700 px-4 py-2 rounded-md text-sm font-medium"
