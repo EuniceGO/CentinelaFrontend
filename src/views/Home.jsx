@@ -34,7 +34,7 @@ function Home() {
 
   const renderCard = (item, isReporte = true) => {
     const fotoSrc = isReporte ? (item.fotoUrl || (item.fotoId ? `${import.meta.env.VITE_BACKEND_URL}/api/fotos/${item.fotoId}` : null)) : null;
-    const id = item.reporteId || item.emergenciaId || item.id
+    const id = item.reporteId || item.emergenciaId || item.id || item.reporte_id || item.emergencia_id;
     const to = isReporte ? `/report/${id}` : `/emergencia/${id}`
     return (
       <Link key={id} to={to} state={isReporte ? { reporte: item } : { emergencia: item }} className="block">
